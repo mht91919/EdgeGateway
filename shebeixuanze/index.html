@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./flexible.js"></script>
+    <script type="text/javascript" src="./jquery.js"></script>
+    <script type="text/javascript" src="./common.js"></script>
+    <link rel="stylesheet" type="text/css" href="./common.css" />
+    <link rel="stylesheet" type="text/css" href="./index.css" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setInterval(getTime, 1000);
+            getOption();
+            getControl()
+        });
+
+        function getTime() {
+
+            $('#resTextTime').html(new Date().toLocaleTimeString());
+
+            $('#resTextDate').html(new Date().toLocaleDateString() + '&nbsp;' + getWeek());
+        }
+
+        function getOption() {
+
+            var parameter = getControl();
+
+
+            $.ajax({
+                url: parameter.getOption,    //后端接口的url,和注解中一致
+                method: 'get',
+                success: function (res) {   //res为后端拿到的数据
+
+                    console.log(res);
+
+                    if (res.status = 200) {
+
+                        var jsonresult = res.result;
+
+                        var resrecord = jsonresult.records
+
+                        console.log(resrecord);
+
+                        if (resrecord != null) {
+
+                            //根据masterCode去重
+                            const uniqueArray = Array.from(new Set(resrecord.map(item => item.masterCode)))
+                                .map(masterCode => resrecord.find(item => item.masterCode === masterCode));
+
+                            console.log(uniqueArray);
+
+                            for (var i = 0; i < uniqueArray.length; i++) {
+
+                                let masterCode = uniqueArray[i].masterCode;
+
+                                //绑定数据到下拉列表
+                                $("#resSeleMasterCode").append('<option class="text_63" value="' + masterCode + '">' + masterCode + '</option>');
+
+                            }
+                        }
+                    }
+                },
+                error: function () {
+
+                }
+            });
+        }
+
+        function confirmSet() {
+            var options = $("#resSeleMasterCode option:selected"); //获取选中的项
+
+            $.ajax({
+                url: "/api/setDevice?name=" + options.val() + "",//路径，就是你要交互的后台的路径
+                method: 'get',
+                success: function (res) {   //res为后端拿到的数据
+
+
+                }
+            });
+        }
+
+        function getControl() {
+            var p;
+
+            $.ajax({
+                type: "Get",//提交方式，分为get和post两种
+                url: "/api/getControl",//路径，就是你要交互的后台的路径
+                async: false,
+                success: function (data) {    //交互成功后的回调函数，data为返回的内容
+                    p = data;
+                }
+            })
+
+            var parameter = JSON.parse(p);
+
+            return parameter;
+        }
+
+        function queryByCode() {
+
+            $.ajax({
+                url: "/api/confirm?name=" + resTextdevice + "",//路径，就是你要交互的后台的路径
+                method: 'get',
+                success: function (res) {   //res为后端拿到的数据
+                    console.log(res);
+                    var jsonobj = JSON.parse(res);
+
+                },
+            });
+        }
+
+
+    </script>
+</head>
+<body>
+    <div class="page flex-col">
+        <div class="block_1 flex-col">
+            <div class="section_1 flex-col">
+                <div class="group_1 flex-row">
+                    <img class="image_1"
+                         referrerpolicy="no-referrer"
+                         src="./img/SketchPng6e2dfcef8cfe5d3e9ec4e6f4b2a720c1e8cab0a396153203f3d57740fde4fe88.png" />
+                    <img class="image_2"
+                         referrerpolicy="no-referrer"
+                         src="./img/SketchPng09261018837d69c72a9a5aa06e008a0eda96bdf9b831a2135672889c0c9f4310.png" />
+                    <span class="text_1">东重边缘计算系统</span>
+                    <div class="text-wrapper_1 flex-col justify-between">
+                        <span class="text_2" id="resTextTime"></span>
+                        <span class="text_3" id="resTextDate"></span>
+                    </div>
+                </div>
+                <div class="group_2 flex-row">
+                    <div class="group_3 flex-col">
+                        <img class="image_3"
+                             referrerpolicy="no-referrer"
+                             src="./img/SketchPngae97cbb86d906b16b50231a7d81c9f514462cfea28dcfd5fd891c2f7d74f4f50.png" />
+                        <span class="text_4">设备绑定</span>
+                        <!--<div class="block_2 flex-row">-->
+                        <select name="selectList" id="resSeleMasterCode" class="text-wrapper_33 flex-col" on size="6">
+                        </select>
+                        <!--<img class="thumbnail_1"
+                             referrerpolicy="no-referrer"
+                             src="./img/SketchPng8ac16da58e32f47ba9c7ddfa5cfca166a997c0f3068954df747102f3bf7145e8.png" />-->
+                        <!--</div>-->
+                        <button class="text-wrapper_32 flex-col text_62" id="resTextConfirm"
+                                type="submit" onclick="confirmSet()">
+                            确认
+                        </button>
+                    </div>
+                </div>
+                <div class="text-wrapper_3 flex-row">
+                    <span class="text_7">东方电气（广州）重型机器有限公司</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
