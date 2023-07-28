@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeGateway", "EdgeGateway.csproj", "{8224FEF8-A6F7-418A-8031-F38FB5A5E229}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "..\ConsoleApp1\ConsoleApp1.csproj", "{AB8C321D-F69E-447E-91E3-87AD98F6E458}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8224FEF8-A6F7-418A-8031-F38FB5A5E229}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8224FEF8-A6F7-418A-8031-F38FB5A5E229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8224FEF8-A6F7-418A-8031-F38FB5A5E229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

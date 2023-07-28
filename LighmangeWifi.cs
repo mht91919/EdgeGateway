@@ -110,7 +110,6 @@ namespace EdgeGateway
             if (!status)
                 //设置消音
                 SetLampBuzz("0");
-
         }
 
         /// <summary>

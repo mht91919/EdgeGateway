@@ -37,6 +37,8 @@ namespace EdgeGateway
 
         private LampManageWifi _lampManageWifi;
 
+        private LampManageUSB _lampManageUSB;
+
         public static int FormStytle = 1;
 
         public RestService()
@@ -72,7 +74,9 @@ namespace EdgeGateway
 
             InitData();
 
-            InitLamp();//初始化三色灯
+            InitLampWifi();//初始化三色灯
+
+            InitLampUSB();
 
             ////初始化Miot的Ws
             //InitWebSocketMiot();
@@ -85,13 +89,20 @@ namespace EdgeGateway
         /// <summary>
         /// 初始化灯
         /// </summary>
-        private void InitLamp()
+        private void InitLampWifi()
         {
             string model = configData.Children().FirstOrDefault(x => x.Path == "model").First.ToString();
             string sim = configData.Children().FirstOrDefault(x => x.Path == "sim").First.ToString();
             string version = configData.Children().FirstOrDefault(x => x.Path == "version").First.ToString();
             var path = configData.Children().FirstOrDefault(x => x.Path == "funSSDControl").First.ToString();
             _lampManageWifi = new LampManageWifi(model, sim, version, path);
+        }
+
+        private void InitLampUSB()
+        {
+            string port = configData.Children().FirstOrDefault(x => x.Path == "port").First.ToString();
+
+            _lampManageUSB = new LampManageUSB(port);
         }
 
         /// <summary>
@@ -122,6 +133,7 @@ namespace EdgeGateway
         {
             webSocketClientCVW.ReceiveData += WebSocketClient_ReceiveData;
         }
+
         /// <summary>
         /// 初始化平台的的ws，监听设备在线数据
         /// </summary>
@@ -362,66 +374,134 @@ namespace EdgeGateway
         /// </summary>
         private void SetLampStatus()
         {
-            //如果灯存在
-            if (_lampManageWifi != null)
+            //选则USB灯
+            if (_edgeGatewayModel.LampManageMode == "1")
             {
-                //如果有任务
-                if (_edgeGatewayModel.HasTask)
+                //如果灯存在
+                if (_lampManageUSB != null)
                 {
-                    //喇叭开着
-                    if (_lampManageWifi._isUseBuzz)
+                    //如果有任务
+                    if (_edgeGatewayModel.HasTask)
                     {
-                        //电压超电流不超
-                        if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                        //喇叭开着
+                        if (_lampManageUSB._isUseBuzz)
                         {
-                            _lampManageWifi.SetLampStatus(1);
+                            //电压超电流不超
+                            if (!_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(1);
+                            }
+                            //电流超电压不超
+                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(2);
+                            }
+                            //电压和电流都超
+                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(3);
+                            }
+                            //电流电压都不超
+                            else
+                            {
+                                _lampManageUSB.SetLampStatus(4);
+                            }
                         }
-                        //电流超电压不超
-                        else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                        {
-                            _lampManageWifi.SetLampStatus(2);
-                        }
-                        //电压和电流都超
-                        else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                        {
-                            _lampManageWifi.SetLampStatus(3);
-                        }
-                        //电流电压都不超
+                        //喇叭关着
                         else
                         {
-                            _lampManageWifi.SetLampStatus(4);
+                            //电压超电流不超
+                            if (!_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(5);
+                            }
+                            //电流超电压不超
+                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(6);
+                            }
+                            //电压和电流都超
+                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageUSB.SetLampStatus(7);
+                            }
+                            //电流电压都不超
+                            else
+                            {
+                                _lampManageUSB.SetLampStatus(8);
+                            }
                         }
                     }
-                    //喇叭关着
                     else
                     {
-                        //电压超电流不超
-                        if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                        //关灯，停止报警
+                        _lampManageUSB.SetLampStatus(0);
+                    }
+                }
+            }
+
+            else if (_edgeGatewayModel.LampManageMode == "1")
+            {
+                //如果灯存在
+                if (_lampManageWifi != null)
+                {
+                    //如果有任务
+                    if (_edgeGatewayModel.HasTask)
+                    {
+                        //喇叭开着
+                        if (_lampManageWifi._isUseBuzz)
                         {
-                            _lampManageWifi.SetLampStatus(5);
+                            //电压超电流不超
+                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(1);
+                            }
+                            //电流超电压不超
+                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(2);
+                            }
+                            //电压和电流都超
+                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(3);
+                            }
+                            //电流电压都不超
+                            else
+                            {
+                                _lampManageWifi.SetLampStatus(4);
+                            }
                         }
-                        //电流超电压不超
-                        else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                        {
-                            _lampManageWifi.SetLampStatus(6);
-                        }
-                        //电压和电流都超
-                        else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                        {
-                            _lampManageWifi.SetLampStatus(7);
-                        }
-                        //电流电压都不超
+                        //喇叭关着
                         else
                         {
-                            _lampManageWifi.SetLampStatus(8);
+                            //电压超电流不超
+                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(5);
+                            }
+                            //电流超电压不超
+                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(6);
+                            }
+                            //电压和电流都超
+                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+                            {
+                                _lampManageWifi.SetLampStatus(7);
+                            }
+                            //电流电压都不超
+                            else
+                            {
+                                _lampManageWifi.SetLampStatus(8);
+                            }
                         }
                     }
-
-                }
-                else
-                {
-                    //关灯，停止报警
-                    _lampManageWifi.SetLampStatus(0);
+                    else
+                    {
+                        //关灯，停止报警
+                        _lampManageWifi.SetLampStatus(0);
+                    }
                 }
             }
         }
@@ -631,8 +711,8 @@ namespace EdgeGateway
 
             _lampManageWifi.SetUseBuzz(_edgeGatewayModel.MuteInfo.Mute);
 
+            _lampManageUSB.SetUseBuzz(_edgeGatewayModel.MuteInfo.Mute);
         }
-
 
         /// <summary>
         /// 无任务的情况下，获取前端选择的焊接模式
@@ -645,6 +725,12 @@ namespace EdgeGateway
             logger.Info("WeldMode:" + _edgeGatewayModel.WeldMode);
         }
 
+        public void setHasTaskLampMode(string uName)
+        {
+            _edgeGatewayModel.LampManageMode = uName;
+
+            logger.Info("LampManageMode:" + _edgeGatewayModel.LampManageMode);
+        }
 
         public nifiWeldMode getHasTaskWeldingMode()
         {
@@ -654,9 +740,7 @@ namespace EdgeGateway
             weldMode.weldMode = _edgeGatewayModel.WeldMode;
 
             return weldMode;
-
         }
-
 
         /// <summary>
         ///  获取任务接口后台
@@ -837,11 +921,6 @@ namespace EdgeGateway
                 }
             }
         }
-
-        /// <summary>
-        /// 任务焊机模式和算法的焊接模式是否一致
-        /// </summary>
-        /// <returns></returns>
 
         /// <summary>
         /// 算法获取电流电压数据
@@ -1271,7 +1350,6 @@ namespace EdgeGateway
                 }
             }
         }
-
 
         /// <summary>
         /// 没有任务，焊接能力选择

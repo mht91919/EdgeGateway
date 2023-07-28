@@ -20,13 +20,26 @@ namespace EdgeGateway
 
 
         /// <summary>
-        /// 无任务时前端选择的焊接模式(0脉冲，1恒流，2埋弧焊)
+        /// 当前三色灯的模式
+        /// 0:Wifi
+        /// 1:USB
+        /// </summary>
+        public string LampManageMode { get; set; } = "0";
+
+        /// <summary>
+        /// 无任务时前端选择的焊接模式
+        /// 0:脉冲
+        /// 1:恒流
+        /// 2:埋弧焊
         /// </summary>
         public string WeldMode { get; set; }
 
 
         /// <summary>
-        /// 设备的焊接能力（恒流1，脉冲2，埋弧焊3）
+        /// 设备的焊接能力
+        /// 恒流1，
+        /// 脉冲2，
+        /// 埋弧焊3
         /// </summary>
         public List<string> WeldingMode { get; set; } = new List<string>();
 
