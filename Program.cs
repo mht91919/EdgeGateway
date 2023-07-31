@@ -23,11 +23,6 @@ namespace EdgeGateway
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //var type = Environment.Is64BitProcess ?
-            //    "x64" : "x86";
-
-            //logger.Info($"CurrenEnvironment:  {type}");
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

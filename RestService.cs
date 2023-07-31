@@ -52,17 +52,6 @@ namespace EdgeGateway
             Init();
         }
 
-        public void Start()
-        {
-            //var path = configData.Children().FirstOrDefault(x => x.Path == "getCurrentVoltageWorkMode").First.ToString();
-
-            //webSocketClientCVW.Connect(path);
-
-            //var path2 = configData.Children().FirstOrDefault(x => x.Path == "getDeviceRealConnect").First.ToString();
-            //webSocketClientDevice.Connect(path2, "{\"cmd\":\"sub\",\"topic\":\"all_device_state\"}");
-
-        }
-
         /// <summary>
         /// 初始话参数
         /// </summary>
@@ -440,7 +429,8 @@ namespace EdgeGateway
                 }
             }
 
-            else if (_edgeGatewayModel.LampManageMode == "1")
+            //Wifi灯
+            else if (_edgeGatewayModel.LampManageMode == "0")
             {
                 //如果灯存在
                 if (_lampManageWifi != null)
