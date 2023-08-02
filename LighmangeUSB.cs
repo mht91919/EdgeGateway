@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO.Ports;
+using System.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace EdgeGateway
@@ -21,6 +23,8 @@ namespace EdgeGateway
         private StopBits _stopBits { get; set; } = StopBits.One;
 
         private Parity _parity { get; set; } = Parity.None;
+
+        private static JObject configData;
 
         /// <summary>
         /// 是否启用喇叭
@@ -174,7 +178,11 @@ namespace EdgeGateway
             return result;
         }
 
-
+        /// <summary>
+        /// 将要发送的字符串转换成16进制的数据流
+        /// </summary>
+        /// <param name="hexString"></param>
+        /// <returns></returns>
         private byte[] HexStrTobyte(string hexString)
         {
             hexString = hexString.Replace(" ", "");
@@ -189,6 +197,7 @@ namespace EdgeGateway
         private bool WriteToSerialPort(byte[] byteArr)
         {
             SerialPort Com = new SerialPort();
+
             try
             {
                 Com.ReadTimeout = 5000;

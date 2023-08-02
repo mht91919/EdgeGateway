@@ -24,7 +24,7 @@ namespace EdgeGateway
         /// 0:Wifi
         /// 1:USB
         /// </summary>
-        public string LampManageMode { get; set; } = "0";
+        public string LampManageMode { get; set; } = "1";
 
         /// <summary>
         /// 无任务时前端选择的焊接模式

@@ -67,9 +67,6 @@ namespace EdgeGateway
 
             InitLampUSB();
 
-            ////初始化Miot的Ws
-            //InitWebSocketMiot();
-
             //InitWebSocketDeviceStatus();
 
             HttpQueryByCodeAndType();
@@ -118,10 +115,6 @@ namespace EdgeGateway
         /// <summary>
         /// 初始化Mito的ws，监听电流电压的数据
         /// </summary>
-        private void InitWebSocketMiot()
-        {
-            webSocketClientCVW.ReceiveData += WebSocketClient_ReceiveData;
-        }
 
         /// <summary>
         /// 初始化平台的的ws，监听设备在线数据
@@ -139,226 +132,6 @@ namespace EdgeGateway
         }
 
         /// <summary>
-        /// 绑定ws收到的结果
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void WebSocketClient_ReceiveData(object sender, WebSocketSharp.MessageEventArgs e)
-        {
-            /*
-             * {"deviceCode":"EQ001","gatewayId":34923,"msgType":"telemetry","ts":1688088096000,
-             * "values":{"taskWeldMode":"0","calcWeldMode":"0","taskId":"ss",
-             * "minVoltage":27.04,"maxVoltage":33.88,"minCurrent":490.7,"maxCurrent":524.7}}
-             * 
-             */
-
-            //电流电压初始值
-            //_edgeGatewayModel.CVWMInfo.maxCurrent = 0;
-            //_edgeGatewayModel.CVWMInfo.minCurrent = 0;
-            //_edgeGatewayModel.CVWMInfo.maxVoltage = 0;
-            //_edgeGatewayModel.CVWMInfo.minVoltage = 0;
-
-            //_edgeGatewayModel.CVWMInfo.medianVoltage = 0;
-            //_edgeGatewayModel.CVWMInfo.medianCurrent = 0;
-
-            //_edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
-            //_edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
-            //_edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
-            //_edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
-
-            //_edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
-            //_edgeGatewayModel.CVWMInfo.medianCurrentexceed = false;
-
-            logger.Info($"算法接口:{DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据:{e.Data}");
-
-            JObject obj = JsonConvert.DeserializeObject<JObject>(e.Data);
-
-            if (obj != null)
-            {
-                var currentID = obj.Children().FirstOrDefault(x => x.Path == "deviceCode").First.ToString();
-                //如果ws推的设备是当前设备
-                if (currentID == _edgeGatewayModel.currentID)
-                {
-                    var values = obj.Children().FirstOrDefault(x => x.Path == "values").First().ToString();
-
-                    var value = JsonConvert.DeserializeObject<JObject>(values);
-
-                    foreach (var item in value.Children())
-                    {
-                        switch (item.Path.ToString())
-                        {
-                            case "taskWeldMode":
-                                _edgeGatewayModel.CVWMInfo.taskWeldMode = item.First.ToString();
-                                break;
-                            case "calcWeldMode":
-                                _edgeGatewayModel.CVWMInfo.calcWeldMode = item.First.ToString();
-                                break;
-                            case "taskId":
-                                _edgeGatewayModel.CVWMInfo.taskId = item.First.ToString();
-                                break;
-
-                            case "minVoltage":
-
-                                decimal minVoltage = 0;
-                                decimal.TryParse(item.First.ToString(), out minVoltage);
-                                _edgeGatewayModel.CVWMInfo.minVoltage = minVoltage;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果脉冲电压小于 脉冲阈值最小值
-                                    if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.minVoltageexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.minVoltageexceed = true;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
-                                    }
-                                }
-
-                                break;
-                            case "maxVoltage":
-
-                                decimal maxVoltage = 0;
-                                decimal.TryParse(item.First.ToString(), out maxVoltage);
-
-                                _edgeGatewayModel.CVWMInfo.maxVoltage = maxVoltage;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果脉冲电压大于 脉冲阈值最大值
-                                    if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.voltage_peak)
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.maxVoltageexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.maxVoltageexceed = true;
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
-                                    }
-                                }
-
-                                break;
-                            case "minCurrent":
-
-                                decimal minCurrent = 0;
-                                decimal.TryParse(item.First.ToString(), out minCurrent);
-
-                                _edgeGatewayModel.CVWMInfo.minCurrent = minCurrent;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果脉冲电流小于 脉冲阈值最小值
-                                    if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base)
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.minCurrentexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.minCurrentexceed = true;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
-                                    }
-                                }
-
-                                break;
-                            case "maxCurrent":
-
-                                decimal maxCurrent = 0;
-                                decimal.TryParse(item.First.ToString(), out maxCurrent);
-
-                                _edgeGatewayModel.CVWMInfo.maxCurrent = maxCurrent;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果脉冲电流大于 脉冲阈值最大值
-                                    if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.current_peak)
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.maxCurrentexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.maxCurrentexceed = true;
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
-                                    }
-                                }
-                                break;
-
-
-                            case "medianVoltage":
-                            case "averageVoltage":
-
-                                decimal medianVoltage = 0;
-                                decimal.TryParse(item.First.ToString(), out medianVoltage);
-
-                                _edgeGatewayModel.CVWMInfo.medianVoltage = medianVoltage;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果恒流电压大于 脉冲阈值最大值或者如果恒流电压小于于 阈值最小值
-                                    if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
-                                     || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
-
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.medianVoltageexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.medianVoltageexceed = true;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
-                                    }
-                                }
-
-                                break;
-                            case "medianCurrent":
-                            case "averageCurrent":
-
-                                decimal medianCurrent = 0;
-                                decimal.TryParse(item.First.ToString(), out medianCurrent);
-
-                                _edgeGatewayModel.CVWMInfo.medianCurrent = medianCurrent;
-
-                                if (_edgeGatewayModel.HasTask)
-                                {
-                                    //如果恒流电流大于 脉冲阈值最大值或者如果恒流电流小于于 阈值最小值
-                                    if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
-                                      || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.current_base)
-                                    {
-                                        if (!_edgeGatewayModel.CVWMInfo.medianCurrentexceed)
-                                        {
-                                            _edgeGatewayModel.CVWMInfo.medianCurrentexceed = true;
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        _edgeGatewayModel.CVWMInfo.medianCurrentexceed = false;
-                                    }
-                                }
-
-                                break;
-                        }
-                    }
-                }
-            }
-
-            //处理是否需要三色灯报警
-            SetLampStatus();
-        }
-
-        /// <summary>
         /// 改变灯和喇叭的状态
         /// </summary>
         private void SetLampStatus()
@@ -366,6 +139,14 @@ namespace EdgeGateway
             //选则USB灯
             if (_edgeGatewayModel.LampManageMode == "1")
             {
+
+                //wifi灯关闭
+                if (_lampManageWifi != null)
+                {
+                    //关灯，停止报警
+                    _lampManageWifi.SetLampStatus(0);
+                }
+
                 //如果灯存在
                 if (_lampManageUSB != null)
                 {
@@ -376,7 +157,7 @@ namespace EdgeGateway
                         if (_lampManageUSB._isUseBuzz)
                         {
                             //电压超电流不超
-                            if (!_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
                             {
                                 _lampManageUSB.SetLampStatus(1);
                             }
@@ -400,7 +181,7 @@ namespace EdgeGateway
                         else
                         {
                             //电压超电流不超
-                            if (!_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
                             {
                                 _lampManageUSB.SetLampStatus(5);
                             }
@@ -432,6 +213,13 @@ namespace EdgeGateway
             //Wifi灯
             else if (_edgeGatewayModel.LampManageMode == "0")
             {
+                //本地灯关闭
+                if (_lampManageUSB != null)
+                {
+                    _lampManageUSB.SetLampStatus(0);
+                }
+
+
                 //如果灯存在
                 if (_lampManageWifi != null)
                 {
@@ -514,7 +302,7 @@ namespace EdgeGateway
 
             await Task.Delay(10000);
 
-            var task = new Task(async () =>
+            var task = new Task(() =>
             {
                 while (true)
                 {
@@ -523,7 +311,7 @@ namespace EdgeGateway
 
                     HttpGetMiot();
 
-                    await Task.Delay(1000);
+                    Task.Delay(1000);
                 }
 
             });
@@ -545,7 +333,6 @@ namespace EdgeGateway
             });
             task2.Start();
         }
-
 
         /// <summary>
         /// 获取服务信息New
@@ -634,7 +421,7 @@ namespace EdgeGateway
 
                 string line = sr.ReadLine();
 
-                //如果文件存在
+                //如果文件不存在
                 if (line == null)
                 {
                     flag = false;
@@ -710,7 +497,19 @@ namespace EdgeGateway
         /// <param name="uName"></param>
         public void setHasTaskWeldingMode(string uName)
         {
-            _edgeGatewayModel.WeldMode = uName;
+            try
+            {
+                StreamWriter sw = new StreamWriter(Application.StartupPath + "\\WeldMode.txt", false);
+
+                _edgeGatewayModel.WeldMode = uName;
+
+                sw.WriteLine(uName);
+                sw.Close();//写入
+            }
+            catch (Exception ex)
+            {
+
+            }
 
             logger.Info("WeldMode:" + _edgeGatewayModel.WeldMode);
         }
@@ -722,12 +521,37 @@ namespace EdgeGateway
             logger.Info("LampManageMode:" + _edgeGatewayModel.LampManageMode);
         }
 
+        /// <summary>
+        /// nifi 获取选择的焊接能力
+        /// </summary>
+        /// <returns></returns>
         public nifiWeldMode getHasTaskWeldingMode()
         {
             /*{ "weldMode":"1"}*/
 
             nifiWeldMode weldMode = new nifiWeldMode();
-            weldMode.weldMode = _edgeGatewayModel.WeldMode;
+
+            if (!File.Exists(Application.StartupPath + "\\WeldMode.txt"))
+            {
+                weldMode.weldMode = _edgeGatewayModel.WeldMode;
+            }
+            else
+            {
+                StreamReader sr = new StreamReader(Application.StartupPath + "\\WeldMode.txt", false);
+
+                string line = sr.ReadLine();
+
+                //如果文件不存在
+                if (line == null)
+                {
+                    weldMode.weldMode = _edgeGatewayModel.WeldMode;
+                }
+                else
+                {
+                    //设备能力
+                    weldMode.weldMode = line.ToString();
+                }
+            }
 
             return weldMode;
         }
@@ -1342,7 +1166,7 @@ namespace EdgeGateway
         }
 
         /// <summary>
-        /// 没有任务，焊接能力选择
+        /// 获取焊接能力
         /// </summary>
         public async void HttpQueryByCodeAndType()
         {
@@ -1426,8 +1250,21 @@ namespace EdgeGateway
                                 strlist.Add("埋弧焊");
                             }
                         }
+                        else
+                        {
+                            throw new Exception("该设备没有焊接能力，请维护！");
+                        }
 
                         _edgeGatewayModel.WeldingMode = strlist;
+
+                        StreamWriter sw = new StreamWriter(Application.StartupPath + "\\XXX.txt", false);
+
+                        _edgeGatewayModel.WeldMode = strlist.FirstOrDefault();
+
+                        sw.WriteLine(_edgeGatewayModel.WeldMode);
+
+                        sw.Close();
+
                     }
                 }
                 catch (Exception ex)
