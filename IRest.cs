@@ -66,6 +66,15 @@ namespace EdgeGateway
         void setHasTaskLampMode(string uName);
 
 
+        /// <summary>
+        /// 获取上次三色灯模式
+        /// </summary>
+        /// <param name="uName"></param>
+        [OperationContract]
+        [WebGet(UriTemplate = "/getHasTaskLampMode", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void getHasTaskLampMode();
+
+
         [OperationContract]
         [WebGet(UriTemplate = "/getHasTaskWeldingMode", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         nifiWeldMode getHasTaskWeldingMode();

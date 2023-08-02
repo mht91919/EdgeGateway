@@ -69,6 +69,8 @@ namespace EdgeGateway
 
             //InitWebSocketDeviceStatus();
 
+            getHasTaskLampMode();
+
             HttpQueryByCodeAndType();
         }
 
@@ -111,10 +113,6 @@ namespace EdgeGateway
             //是否有任务任务初始值
             _edgeGatewayModel.HasTask = false;
         }
-
-        /// <summary>
-        /// 初始化Mito的ws，监听电流电压的数据
-        /// </summary>
 
         /// <summary>
         /// 初始化平台的的ws，监听设备在线数据
@@ -311,6 +309,8 @@ namespace EdgeGateway
 
                     HttpGetMiot();
 
+
+
                     Task.Delay(1000);
                 }
 
@@ -326,6 +326,8 @@ namespace EdgeGateway
 
                     //初始化获取设备状态
                     HttpGetDeviceInitConnect();
+
+
 
                     await Task.Delay(30000);
                 }
@@ -492,9 +494,9 @@ namespace EdgeGateway
         }
 
         /// <summary>
-        /// 无任务的情况下，获取前端选择的焊接模式
+        /// 无任务的情况下，获取UI前端选择的焊接模式
         /// </summary>
-        /// <param name="uName"></param>
+        /// <param name="uName">0脉冲，1恒流，2埋弧焊</param>
         public void setHasTaskWeldingMode(string uName)
         {
             try
@@ -515,8 +517,21 @@ namespace EdgeGateway
         }
 
         public void setHasTaskLampMode(string uName)
-        {
-            _edgeGatewayModel.LampManageMode = uName;
+        {        
+            try
+            {
+                StreamWriter sw = new StreamWriter(Application.StartupPath + "\\LampManageMode.txt", false);
+
+                _edgeGatewayModel.LampManageMode = uName;
+
+                sw.WriteLine(uName);
+
+                sw.Close();//写入
+            }
+            catch (Exception ex)
+            {
+
+            }
 
             logger.Info("LampManageMode:" + _edgeGatewayModel.LampManageMode);
         }
@@ -531,6 +546,7 @@ namespace EdgeGateway
 
             nifiWeldMode weldMode = new nifiWeldMode();
 
+            //如果文件不存在
             if (!File.Exists(Application.StartupPath + "\\WeldMode.txt"))
             {
                 weldMode.weldMode = _edgeGatewayModel.WeldMode;
@@ -551,7 +567,11 @@ namespace EdgeGateway
                     //设备能力
                     weldMode.weldMode = line.ToString();
                 }
+
+                sr.Close();
             }
+
+
 
             return weldMode;
         }
@@ -1255,16 +1275,36 @@ namespace EdgeGateway
                             throw new Exception("该设备没有焊接能力，请维护！");
                         }
 
+                        //焊接能力列表
                         _edgeGatewayModel.WeldingMode = strlist;
 
-                        StreamWriter sw = new StreamWriter(Application.StartupPath + "\\XXX.txt", false);
 
-                        _edgeGatewayModel.WeldMode = strlist.FirstOrDefault();
+                        #region 写入WeldMode文件焊接模式，第一条
+
+                        StreamWriter sw = new StreamWriter(Application.StartupPath + "\\WeldMode.txt", false);
+
+                        string first = strlist.FirstOrDefault();
+
+                        switch (first)
+                        {
+                            case "恒流":
+                                _edgeGatewayModel.WeldMode = "1";
+
+                                break;
+                            case "脉冲":
+                                _edgeGatewayModel.WeldMode = "0";
+                                break;
+                            case "埋弧焊":
+                                _edgeGatewayModel.WeldMode = "2";
+
+                                break;
+                        }
 
                         sw.WriteLine(_edgeGatewayModel.WeldMode);
 
                         sw.Close();
 
+                        #endregion
                     }
                 }
                 catch (Exception ex)
@@ -1292,6 +1332,36 @@ namespace EdgeGateway
             }
 
             return flag;
+        }
+
+        /// <summary>
+        /// 获取灯的状态
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        public void getHasTaskLampMode()
+        {
+            //如果lamp文件不存在。使用本地的灯
+            if (!File.Exists(Application.StartupPath + "\\LampManageMode.txt"))
+            {
+                _edgeGatewayModel.LampManageMode = "1";
+            }
+            else
+            {
+                StreamReader sr = new StreamReader(Application.StartupPath + "\\LampManageMode.txt", false);
+
+                string line = sr.ReadLine();
+
+                //如果文件不存在
+                if (line == null)
+                {
+                    _edgeGatewayModel.LampManageMode = "1";    
+                }
+                else
+                {
+                    //lamp的选择
+                    _edgeGatewayModel.LampManageMode = line.ToString();
+                }
+            }
         }
 
         /// <summary>
