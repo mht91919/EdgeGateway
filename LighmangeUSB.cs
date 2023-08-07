@@ -24,7 +24,6 @@ namespace EdgeGateway
 
         private Parity _parity { get; set; } = Parity.None;
 
-        private static JObject configData;
 
         /// <summary>
         /// 是否启用喇叭
