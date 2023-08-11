@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -134,51 +135,71 @@ namespace EdgeGateway
 
             Task.Delay(10000);
 
-            var task = new Task(() =>
             {
-                while (true)
+                var task = new Task(() =>
                 {
-                    //1秒刷新一次任务
-                    HttpGetTaskInfo();
-                    Task.Delay(1000);
-                }
+                    while (true)
+                    {
 
-            });
-            task.Start();
+                        //1秒刷新一次任务
+                        HttpGetTaskInfo();
 
-            var task3 = new Task(() =>
+
+                        Task.Delay(1000).Wait();
+                    }
+
+                });
+                task.Start();
+            }
+
             {
-                while (true)
+                var task = new Task(() =>
                 {
-                    HttpGetMiot();
-                    Task.Delay(1000);
-                }
+                    while (true)
+                    {
 
-            });
-            task3.Start();
 
-            var task2 = new Task(() =>
+                        HttpGetMiot();
+
+
+                        Task.Delay(1000).Wait();
+                    }
+
+                });
+                task.Start();
+            }
+
             {
-                while (true)
+                var task2 = new Task( () =>
                 {
-                    //三十秒刷新一次平台的接口
-                    HttpGetIOTConnect();
-                    Task.Delay(30000);
-                }
+                    while (true)
+                    {
+                        //三十秒刷新一次平台的接口
+                        HttpGetIOTConnect();
 
-            });
-            task2.Start();
 
-            var task4 = new Task(() =>
+                        Task.Delay(30000).Wait();
+                    }
+
+                });
+                task2.Start();
+            }
+
             {
-                while (true)
+                var task2 = new Task( () =>
                 {
-                    //初始化获取设备状态
-                    HttpGetDeviceInitConnect();
-                    Task.Delay(30000);
-                }
-            });
-            task4.Start();
+                    while (true)
+                    {
+
+                        HttpGetDeviceInitConnect();
+
+                        Task.Delay(30000).Wait();
+                    }
+
+                });
+                task2.Start();
+            }
+
         }
 
 
@@ -188,7 +209,7 @@ namespace EdgeGateway
         /// <returns></returns>
         public EdgeGatewayModel GetTaskInfoNew()
         {
-            logger.Info($"GetTaskInfoNew:{DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据:  {JsonConvert.SerializeObject(_edgeGatewayModel)}");
+            //logger.Info($"GetTaskInfoNew:{DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据:  {JsonConvert.SerializeObject(_edgeGatewayModel)}");
 
             return _edgeGatewayModel;
         }
@@ -448,11 +469,12 @@ namespace EdgeGateway
                     var response = httpClient.GetAsync(url1).Result;
                     var data = response.Content.ReadAsStringAsync().Result;
                     //data = "[]";
-                    logger.Info($"任务接口: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
 
 
                     if (data != null && data.Length > 10)
                     {
+                        logger.Info($"任务接口: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+
                         var objs = JsonConvert.DeserializeObject<List<JObject>>(data);
 
                         if (objs != null && objs.Count > 0)
@@ -894,10 +916,13 @@ namespace EdgeGateway
                     var response = httpClient.GetAsync(url1).Result;
                     var data = response.Content.ReadAsStringAsync().Result;
 
-                    logger.Info($"IOT平台连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+
 
                     if (data != null)
                     {
+
+                        logger.Info($"IOT平台连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+
                         var obj = JsonConvert.DeserializeObject<JObject>(data);
 
                         if (obj != null)
@@ -978,6 +1003,8 @@ namespace EdgeGateway
                 httpClient.Timeout = new TimeSpan(0, 0, 3);
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
 
+                logger.Info($"设备连接状态NEW: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")}");
+
                 try
                 {
 
@@ -989,10 +1016,10 @@ namespace EdgeGateway
 
                     var data = response.Content.ReadAsStringAsync().Result;
 
-                    logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
-
                     if (data != null)
                     {
+                        logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+
                         var obj = JsonConvert.DeserializeObject<JObject>(data);
 
                         if (obj != null)
@@ -1079,10 +1106,11 @@ namespace EdgeGateway
 
                         var data = response.Content.ReadAsStringAsync().Result;
 
-                        logger.Info($"设备焊接能力: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
-
                         if (data != null)
                         {
+
+                            logger.Info($"设备焊接能力: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+
                             var obj = JsonConvert.DeserializeObject<JObject>(data);
 
                             if (obj != null)
