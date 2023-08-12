@@ -170,7 +170,7 @@ namespace EdgeGateway
             }
 
             {
-                var task2 = new Task( () =>
+                var task2 = new Task(() =>
                 {
                     while (true)
                     {
@@ -186,7 +186,7 @@ namespace EdgeGateway
             }
 
             {
-                var task2 = new Task( () =>
+                var task2 = new Task(() =>
                 {
                     while (true)
                     {
@@ -763,11 +763,13 @@ namespace EdgeGateway
                                             decimal.TryParse(item.First.ToString(), out minCurrent);
 
                                             _edgeGatewayModel.CVWMInfo.minCurrent = minCurrent;
-
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_base > 0)
+                                            //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_base > 0
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10)
                                             {
                                                 //如果脉冲电流小于 脉冲阈值最小值
-                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base)
+                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base
+                                                    )
                                                 {
                                                     if (!_edgeGatewayModel.CVWMInfo.minCurrentexceed)
                                                     {
@@ -854,8 +856,9 @@ namespace EdgeGateway
                                             decimal.TryParse(item.First.ToString(), out medianCurrent);
 
                                             _edgeGatewayModel.CVWMInfo.medianCurrent = medianCurrent;
-
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0 && _edgeGatewayModel.TaskInfo.current_base > 0)
+                                            //存在任务，并且任务的峰值基值阈值大于0，并且恒流电流大于等于10A
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0
+                                                && _edgeGatewayModel.TaskInfo.current_base > 0 && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10)
                                             {
                                                 //如果恒流电流大于 脉冲阈值最大值或者如果恒流电流小于于 阈值最小值
                                                 if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
