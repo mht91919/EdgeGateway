@@ -262,7 +262,6 @@ namespace EdgeGateway
 
             return str.Replace("[", "").Replace("]", "").Replace("\r\n", "").Replace("\\", "").Replace(" ", "");
         }
-
         public JObject GetControlJobj()
         {
             string str = File.ReadAllText(Application.StartupPath + "\\contaol.json");
@@ -437,8 +436,6 @@ namespace EdgeGateway
 
                 sr.Close();
             }
-
-
 
             return weldMode;
         }
@@ -919,8 +916,6 @@ namespace EdgeGateway
                     var response = httpClient.GetAsync(url1).Result;
                     var data = response.Content.ReadAsStringAsync().Result;
 
-
-
                     if (data != null)
                     {
 
@@ -1137,17 +1132,25 @@ namespace EdgeGateway
                         //如果设备能力存在
                         if (WeldMode?.Length > 0)
                         {
+                            if (WeldMode.IndexOf("0") > -1)
+                            {
+                                strlist.Add("脉冲");
+                            }
                             if (WeldMode.IndexOf("1") > -1)
                             {
                                 strlist.Add("恒流");
                             }
                             if (WeldMode.IndexOf("2") > -1)
                             {
-                                strlist.Add("脉冲");
+                                strlist.Add("埋弧焊");
                             }
                             if (WeldMode.IndexOf("3") > -1)
                             {
-                                strlist.Add("埋弧焊");
+                                strlist.Add("埋弧焊-丝");
+                            }
+                            if (WeldMode.IndexOf("4") > -1)
+                            {
+                                strlist.Add("埋弧焊-带");
                             }
                         }
                         else
@@ -1167,16 +1170,20 @@ namespace EdgeGateway
 
                         switch (first)
                         {
-                            case "恒流":
-                                _edgeGatewayModel.WeldMode = "1";
-
-                                break;
                             case "脉冲":
                                 _edgeGatewayModel.WeldMode = "0";
                                 break;
+                            case "恒流":
+                                _edgeGatewayModel.WeldMode = "1";
+                                break;
                             case "埋弧焊":
                                 _edgeGatewayModel.WeldMode = "2";
-
+                                break;
+                            case "埋弧焊-丝":
+                                _edgeGatewayModel.WeldMode = "3";
+                                break;
+                            case "埋弧焊-带":
+                                _edgeGatewayModel.WeldMode = "4";
                                 break;
                         }
 

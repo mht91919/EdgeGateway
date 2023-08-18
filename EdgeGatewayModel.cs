@@ -27,19 +27,22 @@ namespace EdgeGateway
         public string LampManageMode { get; set; }
 
         /// <summary>
-        /// 无任务时前端选择的焊接模式
-        /// 0:脉冲
-        /// 1:恒流
-        /// 2:埋弧焊
+        //无任务时前端选择的焊接模式
+        //0:脉冲
+        //1:恒流
+        //2:埋弧焊
+        //3:埋弧焊-丝
+        //4:埋弧焊-带
         /// </summary>
         public string WeldMode { get; set; }
 
-
         /// <summary>
         /// 设备的焊接能力
-        /// 恒流1，
-        /// 脉冲2，
-        /// 埋弧焊3
+        //0:脉冲
+        //1:恒流
+        //2:埋弧焊
+        //3:埋弧焊-丝
+        //4:埋弧焊-带
         /// </summary>
         public List<string> WeldingMode { get; set; } = new List<string>();
 
@@ -65,7 +68,6 @@ namespace EdgeGateway
                 return CVWMInfo.medianVoltageexceed || CVWMInfo.maxVoltageexceed || CVWMInfo.minVoltageexceed;
             }
         }
-
 
         /// <summary>
         /// 任务模块
