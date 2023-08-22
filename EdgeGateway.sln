@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.6.33712.159
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33927.289
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeGateway", "EdgeGateway.csproj", "{8224FEF8-A6F7-418A-8031-F38FB5A5E229}"
 EndProject
@@ -20,13 +20,9 @@ Global
 		{8224FEF8-A6F7-418A-8031-F38FB5A5E229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8224FEF8-A6F7-418A-8031-F38FB5A5E229}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB8C321D-F69E-447E-91E3-87AD98F6E458}.Release|Any CPU.Build.0 = Release|Any CPU
 		{671BEC4C-3390-45B4-AB6A-DBA318CBD529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{671BEC4C-3390-45B4-AB6A-DBA318CBD529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{671BEC4C-3390-45B4-AB6A-DBA318CBD529}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{671BEC4C-3390-45B4-AB6A-DBA318CBD529}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
