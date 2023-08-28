@@ -1,10 +1,13 @@
-﻿function getTime() {
+﻿
+//获取当前时间
+function getTime() {
 
     $('#resTextTime').html(new Date().toLocaleTimeString());
 
     $('#resTextDate').html(new Date().toLocaleDateString() + '&nbsp;' + getWeek());
 }
 
+//报警消音按钮
 function checkclick() {
 
     $.ajax({
@@ -32,68 +35,66 @@ function checkclick() {
     }
 }
 
+//三色灯（0：wifi，1：USB）
+var lamMode = null;
+//焊机模式
+var weldMode = null;
 
-function getHasTaskWeldingMode() {
+//主页面切换焊接模式按钮
+function mainfunswitchweldMode() {
+    $("#_switchMode").css('display', '');
+    $("#_switchweldMode").css('display', '');
+    $("#_switchLamMode").css('display', 'none');
+}
+
+//主页面切换三色灯模式
+function mainfunswitchlampMode() {
+    $("#_switchMode").css('display', '');
+    $("#_switchLamMode").css('display', '');
+    $("#_switchweldMode").css('display', 'none');
+}
+
+//关闭子页面
+function funcloseswitchMode() {
+    $("#_switchMode").css('display', 'none');
+}
+
+
+//子页面USB灯确认
+function funconfirmswitchLampMode() {
+
+    //console.log("当前灯的状态：" + lamMode + "(0:wifi,1:USB)");
+
 
     $.ajax({
         type: "Get",//提交方式，分为get和post两种
-        url: "/api/getTaskInfoNew",//路径，就是你要交互的后台的路径
+        url: "/api/setHasTaskLampMode?name=" + lamMode + "",//路径，就是你要交互的后台的路径
+
         success: function (data) {    //交互成功后的回调函数，data为返回的内容
-
-            console.log("焊接能力个数：" + data.WeldingMode.length);
-
-            for (var i = 0; i < data.WeldingMode.length; i++) {
-
-                $("#_list_1").append('<div class="image-text_4-0 flex-col" style="cursor:pointer;" id="' + data.WeldingMode[i] + '"' + 'onclick="funswitchweldMode(' + '\'' + data.WeldingMode[i] + '\'' + ')" >'
-                    + '<img class="label_5-0" referrerpolicy = "no-referrer" + src = "./img/' + data.WeldingMode[i] + '.png"/>'
-                    + '<span class="text-group_11-0"> ' + data.WeldingMode[i] + '</span ></div>')
-            }
         },
         error: function (data) {
-
-            console.log("getHasTaskWeldingMode Error");
+            console.log("setHasTaskLampMode Error");
         }
-    })
+    });
+
+    $("#_switchMode").css('display', 'none');
 }
 
-//function getHasTaskWeldingMode() {
+//子页面焊接模式确认
+function funconfirmswitchweldMode() {
 
-//    $.ajax({
-//        type: "Get",//提交方式，分为get和post两种
-//        url: "/api/getTaskInfoNew",//路径，就是你要交互的后台的路径
-
-//        success: function (data) {    //交互成功后的回调函数，data为返回的内容
-
-//            console.log("焊接能力个数：" + data.WeldingMode.length);
-
-//            for (var i = 0; i < data.WeldingMode.length; i++) {
-
-//                let masterCode = data.WeldingMode[i]
-
-//                //绑定数据到下拉列表
-//                $("#resSeleMasterCode").append('<option class="text_63" value="' + masterCode + '">' + masterCode + '</option>');
-//            }
-//        },
-//        error: function (data) {
-
-//            console.log("getHasTaskWeldingMode Error");
-//        }
-//    })
-//}
-
-function confirmSet(value) {
-
-    var selectedOption = value.options[value.selectedIndex];
-
-    var selectIndex;
-
-    if (selectedOption.value == "脉冲") {
+    if (weldMode == "脉冲") {
         selectIndex = "0";
-    } else if (selectedOption.value == "恒流") {
+    } else if (weldMode == "恒流") {
         selectIndex = "1";
-    } else if (selectedOption.value == "埋弧焊") {
+    } else if (weldMode == "埋弧焊") {
         selectIndex = "2";
+    } else if (weldMode == "埋弧焊-丝") {
+        selectIndex = "3";
+    } else if (weldMode == "埋弧焊-带") {
+        selectIndex = "4";
     }
+
 
     $.ajax({
         type: "Get",//提交方式，分为get和post两种
@@ -101,7 +102,64 @@ function confirmSet(value) {
 
         success: function (data) {    //交互成功后的回调函数，data为返回的内容
 
+        },
+        error: function (data) {
 
+            console.log("setHasTaskWeldingMode Error");
+        }
+    });
+
+
+
+    $("#_switchMode").css('display', 'none');
+}
+
+//子页面选中三色灯样式改变
+function funswitchLamMode(data) {
+
+    lamMode = data;
+
+
+    if (data === 0) {
+
+        $("#_lampManageWifi").css({ "background-color": "rgba(231, 239, 255, 1)", "border": "1px solid rgba(26, 97, 250, 1)" });
+        $('#_lampManageUSB').css({ "background-color": "", "border": "" });
+    }
+    else {
+
+        $("#_lampManageUSB").css({ "background-color": "rgba(231, 239, 255, 1)", "border": "1px solid rgba(26, 97, 250, 1)" });
+        $('#_lampManageWifi').css({ "background-color": "", "border": "" });
+    }
+}
+
+
+//子页面选中焊接模式样式改变
+function funswitchweldMode(data) {
+
+    weldMode = data;
+
+    $('#_list_1').children().css({ "background-color": "", "border": "" });
+    $('#' + data).css({ "background-color": "rgba(231, 239, 255, 1)", "border": "1px solid rgba(26, 97, 250, 1)" });
+
+}
+
+
+//获取焊接模式列表给子页面
+function getHasTaskWeldingMode() {
+
+    $.ajax({
+        type: "Get",//提交方式，分为get和post两种
+        url: "/api/getTaskInfoNew",//路径，就是你要交互的后台的路径
+        success: function (data) {    //交互成功后的回调函数，data为返回的内容
+
+            //console.log("焊接能力个数：" + data.WeldingMode.length);
+
+            for (var i = 0; i < data.WeldingMode.length; i++) {
+
+                $("#_list_1").append('<div class="image-text_4-0 flex-col" style="cursor:pointer;" id="' + data.WeldingMode[i] + '"' + 'onclick="funswitchweldMode(' + '\'' + data.WeldingMode[i] + '\'' + ')" >'
+                    + '<img class="label_5-0" referrerpolicy = "no-referrer" + src = "./img/' + data.WeldingMode[i] + '.png"/>'
+                    + '<span class="text-group_11-0"> ' + data.WeldingMode[i] + '</span ></div>')
+            }
         },
         error: function (data) {
 
@@ -147,7 +205,10 @@ function getAgreeStatus() {
 
 //退出程序
 function funExit() {
-    console.log("退出");
+
+    //console.log("退出");
+
+
     $.ajax({
         method: 'get',
         url: "/api/exit",//路径，就是你要交互的后台的路径
@@ -235,18 +296,32 @@ function myfunction() {
 
         success: function (res) {    //交互成功后的回调函数，data为返回的内容
 
+            if (res.LampManageMode !== undefined) {
+
+                var LampManageMode = res.LampManageMode;
+
+                //console.log("当前选择的三色灯模式（0：Wifi，1：USB）："+LampManageMode);
+
+                if (LampManageMode === "0") {
+
+                    $('#resLampMode').html("网络报警灯");//网络报警灯
+                    $('#resLampModelImage').attr("src", "./img/网络报警灯.png");
+                }
+
+                else {
+
+
+                    $('#resLampMode').html("本地报警灯");//本地报警灯
+                    $('#resLampModelImage').attr("src", "./img/本地报警灯.png");
+                }
+            }
+
             //如果任务存在
             if (res.HasTask === true) {
 
-                console.log("任务存在");
+                //console.log("任务存在");
 
                 if (res.TaskInfo !== undefined) {
-
-                    console.log("任务存在并且有值");
-
-                    $('#_haseTaskModel').show();
-
-                    $('#resSeleMasterCode').hide();
 
                     $('#_task').show();//任务显示
 
@@ -262,7 +337,7 @@ function myfunction() {
                     }
 
 
-                    console.log("存在任务，任务状态是（0脉冲，1恒流）：" + taskInfo.weld_mode);
+                    //console.log("存在任务，任务状态是（0脉冲，1恒流,2埋弧焊）：" + taskInfo.weld_mode);
 
                     //console.log("采集到的脉冲电流阈值：" + taskInfo.current_base);
                     //console.log("采集到的脉冲电流阈值：" + taskInfo.current_peak);
@@ -274,7 +349,7 @@ function myfunction() {
                     //console.log("采集到的恒流电压阈值：" + taskInfo.voltage_min);
                     //console.log("采集到的恒流电压阈值：" + taskInfo.voltage_max);
 
-                    console.log("模式是否一致（如果结果true，那么就显示这几个字）：" + taskInfo.IsCalcWeldModeequal);
+                    //console.log("模式是否一致（如果结果true，那么就显示这几个字）：" + taskInfo.IsCalcWeldModeequal);
 
 
                     $("#current_base").html(taskInfo.current_base);//电流脉冲基值最小值
@@ -300,11 +375,11 @@ function myfunction() {
 
 
                         $('#resModel').html("脉冲模式");//脉冲模式
-                        $('#resModelImage').attr("src", "./img/SketchPngd018a0dc2d50124dac3dbbde03ccf20afc2dfe3031d6b828021e677b5eac49e5.png");
+                        $('#resModelImage').attr("src", "./img/脉冲.png");
 
                     }
                     //恒流
-                    else {
+                    else if (taskInfo.weld_mode==="1"){
 
                         $('#maichongCurrent').hide();//脉冲电流隐藏
                         $('#maichongVoltage').hide();//脉冲电压隐藏
@@ -314,7 +389,19 @@ function myfunction() {
 
 
                         $('#resModel').html("恒流模式");//恒流模式
-                        $('#resModelImage').attr("src", "./img/SketchPngdf03b8c621c3041b89673428198bbc54085646e9f14a380adb0738386e7e07f3.png");
+                        $('#resModelImage').attr("src", "./img/恒流.png");
+                    }
+                    else {
+                        $('#maichongCurrent').hide();//脉冲电流隐藏
+                        $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                        $('#hengliuCurrent').show();//脉冲电流显示
+                        $('#hengliuVoltage').show();//脉冲电压显示
+
+
+                        $('#resModel').html("埋弧焊模式");//埋弧焊模式
+                        $('#resModelImage').attr("src", "./img/埋弧焊.png");
                     }
 
                     $('#st_no').html(taskInfo.st_no);//流转卡号
@@ -345,11 +432,7 @@ function myfunction() {
                     $('#_task').hide();//任务隐藏
                     $('#_tasknone').show();//无任务显示
 
-                    $('#_haseTaskModel').hide();
-
-                    $('#resSeleMasterCode').show();
-
-                    console.log("没有任务");
+                    //console.log("没有任务");
 
                     $('#_alert').hide();
 
@@ -357,7 +440,7 @@ function myfunction() {
                     if (res.CVWMInfo !== undefined) {
                         var CVWMInfo = res.CVWMInfo;
 
-                        console.log("没有任务，算法给的焊接模式（0脉冲，1恒流）：" + CVWMInfo.calcWeldMode)
+                        //console.log("没有任务，算法给的焊接模式（0脉冲，1恒流，2埋弧焊,3）：" + CVWMInfo.calcWeldMode)
                         //如果采集的模式不为空
                         if (CVWMInfo.calcWeldMode != undefined) {
                             //脉冲
@@ -370,22 +453,56 @@ function myfunction() {
                                 $('#maichongVoltage').show();//脉冲电压显示
 
                                 $('#resModel').html("脉冲模式");//脉冲模式
-                                $('#resModelImage').attr("src", "./img/SketchPngd018a0dc2d50124dac3dbbde03ccf20afc2dfe3031d6b828021e677b5eac49e5.png");
+                                $('#resModelImage').attr("src", "./img/脉冲.png");
 
                             }
                             //恒流
-                            else {
+                            else if (CVWMInfo.calcWeldMode === "1"){
                                 $('#maichongCurrent').hide();//脉冲电流隐藏
                                 $('#maichongVoltage').hide();//脉冲电压隐藏
 
 
-                                $('#hengliuCurrent').show();//脉冲电流显示
-                                $('#hengliuVoltage').show();//脉冲电压显示
+                                $('#hengliuCurrent').show();//恒流电流显示
+                                $('#hengliuVoltage').show();//恒流电压显示
 
 
                                 $('#resModel').html("恒流模式");//恒流模式
-                                $('#resModelImage').attr("src", "./img/SketchPngdf03b8c621c3041b89673428198bbc54085646e9f14a380adb0738386e7e07f3.png");
+                                $('#resModelImage').attr("src", "./img/恒流.png");
 
+                            }
+                            else if (CVWMInfo.calcWeldMode === "2") {
+                                $('#maichongCurrent').hide();//脉冲电流隐藏
+                                $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                                $('#hengliuCurrent').show();//恒流电流显示
+                                $('#hengliuVoltage').show();//恒流电压显示
+
+
+                                $('#resModel').html("埋弧焊模式");//埋弧焊模式
+                                $('#resModelImage').attr("src", "./img/埋弧焊.png");
+                            } else if (CVWMInfo.calcWeldMode === "3") {
+                                $('#maichongCurrent').hide();//脉冲电流隐藏
+                                $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                                $('#hengliuCurrent').show();//恒流电流显示
+                                $('#hengliuVoltage').show();//恒流电压显示
+
+
+                                $('#resModel').html("埋弧焊-丝");//埋弧焊模式
+                                $('#resModelImage').attr("src", "./img/埋弧焊.png");
+                            } else if (CVWMInfo.calcWeldMode === "4") {
+                                $('#maichongCurrent').hide();//脉冲电流隐藏
+                                $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                                $('#hengliuCurrent').show();//恒流电流显示
+                                $('#hengliuVoltage').show();//恒流电压显示
+
+
+                                $('#resModel').html("埋弧焊-带");//埋弧焊模式
+                                $('#resModelImage').attr("src", "./img/埋弧焊.png");
                             }
                         }
                     }
@@ -397,11 +514,7 @@ function myfunction() {
                 $('#_task').hide();//任务隐藏
                 $('#_tasknone').show();//无任务显示
 
-                //$('#_haseTaskModel').hide();
-
-                $('#resSeleMasterCode').show();
-
-                console.log("手工选择焊接模式（0脉冲，1恒流，2埋弧焊）：" + res.WeldMode)
+                //console.log("手工选择焊接模式（0脉冲，1恒流，2埋弧焊）：" + res.WeldMode)
 
 
                 $("#current_base").html(null);//电流脉冲基值最小值
@@ -425,7 +538,7 @@ function myfunction() {
                     //如果采集的模式不为空
                     if (CVWMInfo.calcWeldMode != undefined) {
 
-                        console.log("没有任务的情况下，采集的焊机模式（0脉冲，1恒流）:" + CVWMInfo.calcWeldMode)
+                        //console.log("没有任务的情况下，采集的焊机模式（0脉冲，1恒流）:" + CVWMInfo.calcWeldMode)
 
                         //脉冲
                         if (CVWMInfo.calcWeldMode === "0") {
@@ -437,10 +550,10 @@ function myfunction() {
                             $('#maichongVoltage').show();//脉冲电压显示
 
                             $('#resModel').html("脉冲模式");//脉冲模式
-                            $('#resModelImage').attr("src", "./img/SketchPngd018a0dc2d50124dac3dbbde03ccf20afc2dfe3031d6b828021e677b5eac49e5.png");
+                            $('#resModelImage').attr("src", "./img/脉冲.png");
                         }
                         //恒流
-                        else {
+                        else if (CVWMInfo.calcWeldMode === "1") {
 
                             $('#maichongCurrent').hide();//脉冲电流隐藏
                             $('#maichongVoltage').hide();//脉冲电压隐藏
@@ -451,7 +564,40 @@ function myfunction() {
 
 
                             $('#resModel').html("恒流模式");//恒流模式
-                            $('#resModelImage').attr("src", "./img/SketchPngdf03b8c621c3041b89673428198bbc54085646e9f14a380adb0738386e7e07f3.png");
+                            $('#resModelImage').attr("src", "./img/恒流.png");
+                        } else if (CVWMInfo.calcWeldMode === "2") {
+                            $('#maichongCurrent').hide();//脉冲电流隐藏
+                            $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                            $('#hengliuCurrent').show();//脉冲电流显示
+                            $('#hengliuVoltage').show();//脉冲电压显示
+
+
+                            $('#resModel').html("埋弧焊-丝");//恒流模式
+                            $('#resModelImage').attr("src", "./img/埋弧焊.png");
+                        } else if (CVWMInfo.calcWeldMode === "3") {
+                            $('#maichongCurrent').hide();//脉冲电流隐藏
+                            $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                            $('#hengliuCurrent').show();//脉冲电流显示
+                            $('#hengliuVoltage').show();//脉冲电压显示
+
+
+                            $('#resModel').html("埋弧焊-丝");//恒流模式
+                            $('#resModelImage').attr("src", "./img/埋弧焊.png");
+                        } else if (CVWMInfo.calcWeldMode === "4") {
+                            $('#maichongCurrent').hide();//脉冲电流隐藏
+                            $('#maichongVoltage').hide();//脉冲电压隐藏
+
+
+                            $('#hengliuCurrent').show();//脉冲电流显示
+                            $('#hengliuVoltage').show();//脉冲电压显示
+
+
+                            $('#resModel').html("埋弧焊-带");//恒流模式
+                            $('#resModelImage').attr("src", "./img/埋弧焊.png");
                         }
                     }
                     //如果采集的模式为空，那么显示脉冲的
@@ -464,13 +610,13 @@ function myfunction() {
                         $('#maichongVoltage').show();//脉冲电压显示
 
                         $('#resModel').html("脉冲模式");//脉冲模式
-                        $('#resModelImage').attr("src", "./img/SketchPngd018a0dc2d50124dac3dbbde03ccf20afc2dfe3031d6b828021e677b5eac49e5.png");
+                        $('#resModelImage').attr("src", "./img/脉冲.png");
                     }
                 }
                 //如果采集也停了（显示脉冲的）
                 else {
 
-                    console.log("没有任务,采集也停了的情况下");
+                    //console.log("没有任务,采集也停了的情况下");
 
                     $('#hengliuCurrent').hide();//恒流电流隐藏
                     $('#hengliuVoltage').hide();//恒流电压隐藏
@@ -479,7 +625,7 @@ function myfunction() {
                     $('#maichongVoltage').show();//脉冲电压显示
 
                     $('#resModel').html("脉冲模式");//脉冲模式
-                    $('#resModelImage').attr("src", "./img/SketchPngd018a0dc2d50124dac3dbbde03ccf20afc2dfe3031d6b828021e677b5eac49e5.png");
+                    $('#resModelImage').attr("src", "./img/脉冲.png");
                 }
             }
 
@@ -493,7 +639,6 @@ function myfunction() {
                 if (res.IOTConnectInfo.result !== undefined && res.IOTConnectInfo.result === true) {
 
                     clearInterval(th);
-
 
                     $('#rescheckIOTConnect').attr("src", "./img/open.png");
                 }
@@ -659,16 +804,17 @@ function myfunction() {
                     document.getElementById("resVoltagePeakInteger").style.color = null;
                     document.getElementById("resVoltagePeakDecimal").style.color = null;
                 }
-                //脉冲电压基值
-                if (CVWMInfo.minVoltageexceed) {
-                    document.getElementById("resVoltageBaseInteger").style.color = "rgba(255, 15, 51, 1)";
-                    document.getElementById("resVoltageBaseDecimal").style.color = "rgba(255, 15, 51, 1)";
-                }
-                else {
-                    document.getElementById("resVoltageBaseInteger").style.color = null;
-                    document.getElementById("resVoltageBaseDecimal").style.color = null;
 
-                }
+                //脉冲电压基值（不显示 廖德庚需求20230816）
+                //if (CVWMInfo.minVoltageexceed) {
+                //    document.getElementById("resVoltageBaseInteger").style.color = "rgba(255, 15, 51, 1)";
+                //    document.getElementById("resVoltageBaseDecimal").style.color = "rgba(255, 15, 51, 1)";
+                //}
+                //else {
+                //    document.getElementById("resVoltageBaseInteger").style.color = null;
+                //    document.getElementById("resVoltageBaseDecimal").style.color = null;
+                //}
+
                 //恒流，埋弧焊电流
                 if (CVWMInfo.medianCurrentexceed) {
                     document.getElementById("reshengliuAinteger").style.color = "rgba(255, 15, 51, 1)";
