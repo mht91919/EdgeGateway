@@ -25,94 +25,6 @@
             $('#resTextExit').click(funExit);
         });
 
-        var lamMode = null;
-        var weldMode = null;
-
-        function mainfunswitchweldMode() {
-            $("#_switchMode").css('display', '');
-            $("#_switchweldMode").css('display', '');
-            $("#_switchLamMode").css('display', 'none');
-        }
-
-        function mainfunswitchlampMode() {
-            $("#_switchMode").css('display', '');
-            $("#_switchLamMode").css('display', '');
-            $("#_switchweldMode").css('display', 'none');
-        }
-
-        function funcloseswitchMode() {
-            $("#_switchMode").css('display', 'none');
-        }
-
-        function funconfirmswitchLampMode() {
-
-
-            console.log("当前灯的状态：" + lamMode+"(0:wifi,1:USB)");
-            $.ajax({
-                type: "Get",//提交方式，分为get和post两种
-                url: "/api/setHasTaskLampMode?name=" + lamMode + "",//路径，就是你要交互的后台的路径
-
-                success: function (data) {    //交互成功后的回调函数，data为返回的内容
-                },
-                error: function (data) {
-                    console.log("setHasTaskLampMode Error");
-                }
-            });
-
-            $("#_switchMode").css('display', 'none');
-        }
-
-        function funconfirmswitchweldMode() {
-
-            if (weldMode == "脉冲") {
-                selectIndex = "0";
-            } else if (weldMode == "恒流") {
-                selectIndex = "1";
-            } else if (weldMode == "埋弧焊") {
-                selectIndex = "2";
-            }
-
-            $.ajax({
-                type: "Get",//提交方式，分为get和post两种
-                url: "/api/setHasTaskWeldingMode?name=" + selectIndex + "",//路径，就是你要交互的后台的路径
-
-                success: function (data) {    //交互成功后的回调函数，data为返回的内容
-
-                    alert();
-                },
-                error: function (data) {
-
-                    console.log("setHasTaskWeldingMode Error");
-                }
-            });
-
-            $("#_switchMode").css('display', 'none');
-        }
-
-        function funswitchLamMode(data) {
-
-            lamMode = data;
-
-            if (data === 0) {
-                document.getElementById("_lampManageWifi").style.backgroundColor = "rgba(231, 239, 255, 1)";
-                document.getElementById("_lampManageUSB").style.backgroundColor = null;
-
-            }
-            else {
-                document.getElementById("_lampManageUSB").style.backgroundColor = "rgba(231, 239, 255, 1)";
-                document.getElementById("_lampManageWifi").style.backgroundColor = null;
-            }
-        }
-
-        function funswitchweldMode(data) {
-
-            weldMode = data;
-
-            $('#_list_1').children().css({ "background-color": "" });
-            $('#' + data).css({ "background-color": "rgba(231, 239, 255, 1)" });
-
-        }
-
     </script>
 </head>
 <body>
@@ -190,6 +102,15 @@
                                 </div>
                             </div>
 
+                            <div class="group_16 flex-row">
+                                <span class="text_10" id="resLampMode"></span>
+                                <div class="image-wrapper_1 flex-col">
+                                    <img class="thumbnail_10" id="resLampModelImage"
+                                         referrerpolicy="no-referrer"
+                                         src="./img/本地报警灯.png" />
+                                </div>
+                            </div>
+
                             <div class="group_16 flex-row" id="_haseTaskModel">
                                 <span class="text_9" id="resModel"></span>
                                 <div class="image-wrapper_1 flex-col">
@@ -199,8 +120,6 @@
                                 </div>
                             </div>
 
-                            <!--<select name="selectList" id="resSeleMasterCode" class="text-wrapper_33 flex-row" onclick="confirmSet(this)" onchange="changecolor()">
-                            </select>-->
                         </div>
 
                         <!------------------------------------------------------------>
@@ -219,9 +138,9 @@
                             <div class="group_17 flex-row">
                                 <div class="image-text_8 flex-row justify-between">
                                     <div class="text-group_8 flex-col justify-between">
-                                        <span class="text_111">阈值</span>
+                                        <span class="text_199">阈值</span>
                                         <span class="text_11" id="current_base"></span>
-                                        <span class="text_12">基值最小值</span>
+                                        <span class="text_20">基值最小值</span>
                                     </div>
                                     <img class="image_5"
                                          referrerpolicy="no-referrer"
@@ -300,7 +219,7 @@
                                 <div class="image-text_10 flex-row justify-between">
                                     <div class="text-group_10 flex-col justify-between">
                                         <span class="text_111">阈值</span>
-                                        <span class="text_25" id="voltage_base"></span>
+                                        <span class="text_25"></span>
                                         <span class="text_12">基值最小值</span>
                                     </div>
                                     <img class="image_9"
@@ -308,7 +227,7 @@
                                          src="./img/SketchPngf26d5eaaaaef810a66edefaf4d1b092fa6902e337a61e075a9ae1393ccb8bb45.png" />
                                 </div>
                                 <span class="text_27">888</span>
-                                <span class="text_28" id="resVoltageBaseInteger"></span>
+                                <span class="text_28"></span>
                                 <span class="text_29">.8</span>
                                 <img class="image_10"
                                      referrerpolicy="no-referrer"
@@ -326,7 +245,7 @@
                                         <span class="text_33">峰值最大值</span>
                                     </div>
                                 </div>
-                                <span class="text_34" id="resVoltageBaseDecimal"></span>
+                                <span class="text_34"></span>
                                 <span class="text_35" id="resVoltagePeakDecimal"></span>
 
                             </div>
@@ -523,12 +442,14 @@
                 </div>
                 <div class="list_1 flex-row" id="_list_1">
                 </div>
+
                 <img class="image_12"
                      referrerpolicy="no-referrer"
                      src="./img/SketchPng7841727e7e3900ba510bf328ddbb955b1ac0948e4e43418e5054b5f5013322a7.png" />
                 <div class="text-wrapper_7 flex-col" style="cursor:pointer;" onclick="funconfirmswitchweldMode()">
                     <span class="text_44">确认</span>
                 </div>
+
             </div>
 
             <div class="group_12 flex-col" id="_switchLamMode">
@@ -539,23 +460,39 @@
                          referrerpolicy="no-referrer"
                          src="./img/SketchPng1c41a5353b4174a5504de7c57ce313824cd604afdc41a966d1b26607b3a76e91.png" />
                 </div>
-                <div class="section_4 flex-row justify-between">
-                    <div class="text-wrapper_8 flex-col" id="_lampManageWifi" style="cursor:pointer;" onclick="funswitchLamMode(0)">
-                        <span class="text_46">网络报警灯</span>
-                    </div>
-                    <div class="text-wrapper_9 flex-col" id="_lampManageUSB" style="cursor:pointer;" onclick="funswitchLamMode(1)">
-                        <span class="text_47">本地报警灯</span>
-                    </div>
-                </div>
+                <div class="section_4 flex-row justify-between flex-wrap">
 
-                <img class="image_133"
-                     referrerpolicy="no-referrer"
-                     src="./img/SketchPng54cbb281549fe6e284672cb062a26cea1a0216ed7b864d86a0b0a3c6b5c6d025.png" />
-                <div class="text-wrapper_10 flex-col" style="cursor:pointer;" onclick="funconfirmswitchLampMode()">
-                    <span class="text_48">确认</span>
+                    <div class="text-wrapper_8 flex-col" id="_lampManageWifi" style="cursor:pointer;" onclick="funswitchLamMode(0)">
+
+                        <div class="image-text_88 flex-col justify-between">
+                            <img class="label_8"
+                                 referrerpolicy="no-referrer"
+                                 src="./img/网络报警灯.png" />
+
+                            <span class="text_46">网络报警灯</span>
+                        </div>
+                    </div>
+
+                    <div class="text-wrapper_9 flex-col" id="_lampManageUSB" style="cursor:pointer;" onclick="funswitchLamMode(1)">
+
+                        <div class="image-text_99 flex-col justify-between">
+                            <img class="label_9"
+                                 referrerpolicy="no-referrer"
+                                 src="./img/本地报警灯.png" />
+
+                            <span class="text_47">本地报警灯</span>
+                        </div>
+                    </div>
+
+                    <img class="image_133"
+                         referrerpolicy="no-referrer"
+                         src="./img/SketchPng54cbb281549fe6e284672cb062a26cea1a0216ed7b864d86a0b0a3c6b5c6d025.png" />
+                    <div class="text-wrapper_10 flex-col" style="cursor:pointer;" onclick="funconfirmswitchLampMode()">
+                        <span class="text_48">确认</span>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </div>
 </body>
 </html>

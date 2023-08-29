@@ -73,3 +73,7 @@ button:active {
   display: flex;
   align-items: flex-end;
 }
+
+.flex-wrap {
+  flex-wrap: wrap;
+}

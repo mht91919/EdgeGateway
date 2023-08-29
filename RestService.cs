@@ -190,8 +190,8 @@ namespace EdgeGateway
                 {
                     while (true)
                     {
-
-                        HttpGetDeviceInitConnectCpro();
+                        HttpGetDeviceInitConnect();
+                        //HttpGetDeviceInitConnectCpro();
 
                         Task.Delay(30000).Wait();
                     }
@@ -944,117 +944,117 @@ namespace EdgeGateway
         /// <summary>
         /// 设备连接状态
         /// </summary>
-        //public void HttpGetDeviceInitConnect()
-        //{
-        //    /*
-        //     {
-        // "status": 200,
-        // "msg": "设备查询成功",
-        // "result": {
-        //  "records": [{
-        //   "id": "1123700207420829696",
-        //   "code": "test555",
-        //   "name": "name",
-        //   "protoId": "1032000",
-        //   "readInterval": "100",
-        //   "config": "{\"ip\":\"10.56\",\"port\":\"8193\",\"conn_timeout\":\"5000\"}",
-        //   "state": 0,
-        //   "workState": 0,
-        //   "lastestTime": null,
-        //   "lastestTimeStr": null,
-        //   "online": null,
-        //   "groupId": "0",
-        //   "errorMessage": null,
-        //   "masterCode": null,
-        //   "mprotoVO": null
-        //  }, {
-        //   "id": "1123694585916813312",
-        //   "code": "modbus001-4",
-        //   "name": "modbus001-4",
-        //   "protoId": "1000001",
-        //   "readInterval": "1000,2000",
-        //   "config": "{\"ip\":\"10.90.254.239\",\"port\":\"502\",\"station_id\":\"1\",\"endian\":\"CDAB\",\"start_zero\":true,\"conn_timeout\":\"5000\",\"batchRead\":false}",
-        //   "state": 0,
-        //   "workState": 0,
-        //   "lastestTime": null,
-        //   "lastestTimeStr": "2023-06-29 15:53:31",
-        //   "online": 0,
-        //   "groupId": "1671430297109368833",
-        //   "errorMessage": "",
-        //   "masterCode": "modbus001",
-        //   "mprotoVO": null
-        //  }],!
-        //  "total": "8",
-        //  "size": "999",
-        //  "current": "1",
-        //  "orders": [],
-        //  "optimizeCountSql": true,
-        //  "searchCount": true,
-        //  "maxLimit": null,
-        //  "countId": null,
-        //  "pages": "1"
-        // }
-        //}*/
-        //    bool isconnect = true;
-        //    using (var httpClient = new HttpClient())
-        //    {
-        //        httpClient.Timeout = new TimeSpan(0, 0, 3);
-        //        httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
+        public void HttpGetDeviceInitConnect()
+        {
+            /*
+             {
+         "status": 200,
+         "msg": "设备查询成功",
+         "result": {
+          "records": [{
+           "id": "1123700207420829696",
+           "code": "test555",
+           "name": "name",
+           "protoId": "1032000",
+           "readInterval": "100",
+           "config": "{\"ip\":\"10.56\",\"port\":\"8193\",\"conn_timeout\":\"5000\"}",
+           "state": 0,
+           "workState": 0,
+           "lastestTime": null,
+           "lastestTimeStr": null,
+           "online": null,
+           "groupId": "0",
+           "errorMessage": null,
+           "masterCode": null,
+           "mprotoVO": null
+          }, {
+           "id": "1123694585916813312",
+           "code": "modbus001-4",
+           "name": "modbus001-4",
+           "protoId": "1000001",
+           "readInterval": "1000,2000",
+           "config": "{\"ip\":\"10.90.254.239\",\"port\":\"502\",\"station_id\":\"1\",\"endian\":\"CDAB\",\"start_zero\":true,\"conn_timeout\":\"5000\",\"batchRead\":false}",
+           "state": 0,
+           "workState": 0,
+           "lastestTime": null,
+           "lastestTimeStr": "2023-06-29 15:53:31",
+           "online": 0,
+           "groupId": "1671430297109368833",
+           "errorMessage": "",
+           "masterCode": "modbus001",
+           "mprotoVO": null
+          }],!
+          "total": "8",
+          "size": "999",
+          "current": "1",
+          "orders": [],
+          "optimizeCountSql": true,
+          "searchCount": true,
+          "maxLimit": null,
+          "countId": null,
+          "pages": "1"
+         }
+        }*/
+            bool isconnect = true;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.Timeout = new TimeSpan(0, 0, 3);
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
 
-        //        logger.Info($"设备连接状态NEW: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")}");
+                logger.Info($"设备连接状态NEW: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")}");
 
-        //        try
-        //        {
+                try
+                {
 
-        //            var path = configData.Children().FirstOrDefault(x => x.Path == "getOption").First.ToString();
-        //            //get
-        //            var url1 = new Uri(path);
-        //            // response
-        //            var response = httpClient.GetAsync(url1).Result;
+                    var path = configData.Children().FirstOrDefault(x => x.Path == "getOption").First.ToString();
+                    //get
+                    var url1 = new Uri(path);
+                    // response
+                    var response = httpClient.GetAsync(url1).Result;
 
-        //            var data = response.Content.ReadAsStringAsync().Result;
+                    var data = response.Content.ReadAsStringAsync().Result;
 
-        //            if (data != null)
-        //            {
-        //                logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
+                    if (data != null)
+                    {
+                        logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
 
-        //                var obj = JsonConvert.DeserializeObject<JObject>(data);
+                        var obj = JsonConvert.DeserializeObject<JObject>(data);
 
-        //                if (obj != null)
-        //                {
-        //                    var status = obj.Children().FirstOrDefault(x => x.Path == "status").First.ToString();
+                        if (obj != null)
+                        {
+                            var status = obj.Children().FirstOrDefault(x => x.Path == "status").First.ToString();
 
-        //                    if (status == "200")
-        //                    {
-        //                        //result 对象
-        //                        var result = obj.Children().FirstOrDefault(x => x.Path == "result").First.ToString();
+                            if (status == "200")
+                            {
+                                //result 对象
+                                var result = obj.Children().FirstOrDefault(x => x.Path == "result").First.ToString();
 
-        //                        //result 对象数组
-        //                        var results = JsonConvert.DeserializeObject<JObject>(result).Children().FirstOrDefault().First.ToString();
+                                //result 对象数组
+                                var results = JsonConvert.DeserializeObject<JObject>(result).Children().FirstOrDefault().First.ToString();
 
-        //                        //records数组
-        //                        var records = JsonConvert.DeserializeObject<List<JObject>>(results);
+                                //records数组
+                                var records = JsonConvert.DeserializeObject<List<JObject>>(results);
 
-        //                        foreach (var record in records)
-        //                        {
-        //                            var device = record.Children().FirstOrDefault(x => x.Path == "masterCode");
-        //                            if (device.First.ToString() == _edgeGatewayModel.currentID)
-        //                            {
-        //                                //都为1
-        //                                isconnect &= record.Children().FirstOrDefault(x => x.Path == "online").First.ToString() == "1";
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            _edgeGatewayModel.DeviceConnectInfo.online = isconnect;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            logger.Error($"{"IsDeviceConnectIonline:" + ex.Message}");
-        //        }
-        //    }
-        //}
+                                foreach (var record in records)
+                                {
+                                    var device = record.Children().FirstOrDefault(x => x.Path == "masterCode");
+                                    if (device.First.ToString() == _edgeGatewayModel.currentID)
+                                    {
+                                        //都为1
+                                        isconnect &= record.Children().FirstOrDefault(x => x.Path == "online").First.ToString() == "1";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    _edgeGatewayModel.DeviceConnectInfo.online = isconnect;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"{"IsDeviceConnectIonline:" + ex.Message}");
+                }
+            }
+        }
 
         public void HttpGetDeviceInitConnectCpro()
         {
@@ -1082,7 +1082,7 @@ namespace EdgeGateway
                         logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
 
                         //1 连接状态  0 断开状态
-                        if (data=="1")
+                        if (data.ToString()=="1")
                         {
                             isconnect = true;
                         }

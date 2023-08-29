@@ -19,6 +19,13 @@ function convert_to_float(a) {
     return floatValue;
 }
 
+
+function roundFun(value, decimal) {
+    //value——值
+    //decimal——保留小数位数
+    return Math.round(value * Math.pow(10, decimal)) / Math.pow(10, decimal);
+}
+
 function exceeding_threshold(a, b) {
 
     // 将字符串类型转换为浮点数
