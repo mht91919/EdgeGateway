@@ -190,8 +190,8 @@ namespace EdgeGateway
                 {
                     while (true)
                     {
-                        HttpGetDeviceInitConnect();
-                        //HttpGetDeviceInitConnectCpro();
+                        //HttpGetDeviceInitConnect();
+                        HttpGetDeviceInitConnectCpro();
 
                         Task.Delay(30000).Wait();
                     }
