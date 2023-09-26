@@ -112,8 +112,6 @@ namespace EdgeGateway
             _edgeGatewayModel.HasTask = false;
         }
 
-
-
         /// <summary>
         /// 创建一个服务
         /// </summary>
@@ -202,7 +200,6 @@ namespace EdgeGateway
             }
 
         }
-
 
         /// <summary>
         /// 获取服务信息New
@@ -704,8 +701,9 @@ namespace EdgeGateway
                                             decimal minVoltage = 0;
                                             decimal.TryParse(item.First.ToString(), out minVoltage);
                                             _edgeGatewayModel.CVWMInfo.minVoltage = minVoltage;
-
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_base > 0)
+                                            //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_base > 0
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10)
                                             {
                                                 //如果脉冲电压小于 脉冲阈值最小值
                                                 if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
@@ -733,7 +731,8 @@ namespace EdgeGateway
 
                                             _edgeGatewayModel.CVWMInfo.maxVoltage = maxVoltage;
 
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0)
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10)
                                             {
                                                 //如果脉冲电压大于 脉冲阈值最大值
                                                 if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.voltage_peak)
@@ -823,8 +822,8 @@ namespace EdgeGateway
                                             decimal.TryParse(item.First.ToString(), out medianVoltage);
 
                                             _edgeGatewayModel.CVWMInfo.medianVoltage = medianVoltage;
-
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0 && _edgeGatewayModel.TaskInfo.voltage_base > 0)
+                                            //存在任务，并且任务的峰值基值阈值大于0，并且恒流电流大于等于10A
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0 && _edgeGatewayModel.TaskInfo.voltage_base > 0 && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10)
                                             {
                                                 //如果恒流电压大于 脉冲阈值最大值或者如果恒流电压小于于 阈值最小值
                                                 if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
@@ -854,11 +853,11 @@ namespace EdgeGateway
                                             decimal.TryParse(item.First.ToString(), out medianCurrent);
 
                                             _edgeGatewayModel.CVWMInfo.medianCurrent = medianCurrent;
-                                            //存在任务，并且任务的峰值基值阈值大于0，并且恒流电流大于等于10A
+                                            //存在任务，并且任务的基值阈值大于0，并且恒流电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0
                                                 && _edgeGatewayModel.TaskInfo.current_base > 0 && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10)
                                             {
-                                                //如果恒流电流大于 脉冲阈值最大值或者如果恒流电流小于于 阈值最小值
+                                                //如果恒流电流大于 阈值最大值或者如果恒流电流小于于 阈值最小值
                                                 if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
                                                   || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.current_base)
                                                 {
