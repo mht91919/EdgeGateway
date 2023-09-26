@@ -175,8 +175,9 @@ namespace EdgeGateway
                     while (true)
                     {
                         //三十秒刷新一次平台的接口
-                        HttpGetIOTConnect();
+                        //HttpGetIOTConnect();
 
+                        HttpGetIOTConnectCpro();
 
                         Task.Delay(30000).Wait();
                     }
@@ -936,6 +937,46 @@ namespace EdgeGateway
                 }
                 catch (Exception ex)
                 {
+                    isconnect=false;
+                    _edgeGatewayModel.IOTConnectInfo.result = isconnect;
+
+                    logger.Error($"{"HttpGetIOTConnectError:" + ex.Message}");
+                }
+            }
+        }
+        public void HttpGetIOTConnectCpro()
+        {
+            /*
+             {"status":200,"msg":"请求成功","result":true}
+             */
+            bool isconnect = true;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.Timeout = new TimeSpan(0, 0, 3);
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
+
+                try
+                {
+                    var path = configData.Children().FirstOrDefault(x => x.Path == "getIOTConnectCpro").First.ToString();
+                    //get
+                    var url1 = new Uri(path);
+                    // response
+                    var response = httpClient.GetAsync(url1).Result;
+                    var data = response.Content.ReadAsStringAsync().Result;
+
+                    if (data != null&& data== "OK")
+                    {
+                        isconnect = true;
+                    }
+                    else { isconnect = false; }
+
+                    _edgeGatewayModel.IOTConnectInfo.result = isconnect;
+                }
+                catch (Exception ex)
+                {
+                    isconnect = false;
+                    _edgeGatewayModel.IOTConnectInfo.result = isconnect;
+
                     logger.Error($"{"HttpGetIOTConnectError:" + ex.Message}");
                 }
             }
@@ -1051,6 +1092,9 @@ namespace EdgeGateway
                 }
                 catch (Exception ex)
                 {
+                    isconnect = false;
+                    _edgeGatewayModel.DeviceConnectInfo.online = isconnect;
+
                     logger.Error($"{"IsDeviceConnectIonline:" + ex.Message}");
                 }
             }
@@ -1095,6 +1139,9 @@ namespace EdgeGateway
                 }
                 catch (Exception ex)
                 {
+                    isconnect = false;
+                    _edgeGatewayModel.DeviceConnectInfo.online = isconnect;
+
                     logger.Error($"{"IsDeviceConnectIonline:" + ex.Message}");
                 }
             }
