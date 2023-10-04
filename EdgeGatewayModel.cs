@@ -9,6 +9,11 @@ namespace EdgeGateway
     public class EdgeGatewayModel
     {
         /// <summary>
+        /// 预警参数
+        /// </summary>
+        public decimal earlyWarning { get; set; }
+
+        /// <summary>
         /// 当前绑定的设备编码
         /// </summary>
         public string currentID { get; set; }
@@ -46,9 +51,8 @@ namespace EdgeGateway
         /// </summary>
         public List<string> WeldingMode { get; set; } = new List<string>();
 
-        //TODO:上下限报警用或门？
         /// <summary>
-        /// 电流的上限下限报警
+        /// 电流的上限下限报警(阈值)
         /// </summary>
         public bool IsCurrentAlarm
         {
@@ -59,7 +63,7 @@ namespace EdgeGateway
         }
 
         /// <summary>
-        /// 电压的上下限报警
+        /// 电压的上下限报警(阈值)
         /// </summary>
         public bool IsVoltageAlarm
         {
@@ -68,6 +72,29 @@ namespace EdgeGateway
                 return CVWMInfo.medianVoltageexceed || CVWMInfo.maxVoltageexceed || CVWMInfo.minVoltageexceed;
             }
         }
+
+        /// <summary>
+        /// 电流的上限下限报警(预警)
+        /// </summary>
+        public bool IsCurrentAlarmYujing
+        {
+            get
+            {
+                return CVWMInfo.medianCurrentexceedYujing || CVWMInfo.maxCurrentexceedYujing || CVWMInfo.minCurrentexceedYujing;
+            }
+        }
+
+        /// <summary>
+        /// 电压的上下限报警(预警)
+        /// </summary>
+        public bool IsVoltageAlarmYujing
+        {
+            get
+            {
+                return CVWMInfo.medianVoltageexceedYujing || CVWMInfo.maxVoltageexceedYujing || CVWMInfo.minVoltageexceedYujing;
+            }
+        }
+
 
         /// <summary>
         /// 任务模块
@@ -99,6 +126,47 @@ namespace EdgeGateway
     /// </summary>
     public class TaskInfo
     {
+        public decimal earlyWarning;
+
+        /// <summary>
+        /// 脉冲电流基值预警
+        /// </summary>
+        public decimal earlycurrent_base=> current_base + (current_peak - current_base) * earlyWarning;
+        /// <summary>
+        /// 脉冲电流峰值预警
+        /// </summary>
+        public decimal earlycurrent_peak => current_peak - (current_peak - current_base) * earlyWarning;
+
+        /// <summary>
+        ///  脉冲电压基值预警
+        /// </summary>
+        public decimal earlyvoltage_base => voltage_base + (voltage_peak - voltage_base) * earlyWarning;
+        /// <summary>
+        /// 脉冲电压峰值预警
+        /// </summary>
+        public decimal earlyvoltage_peak => voltage_base - (voltage_peak - voltage_base) * earlyWarning;
+
+        /// <summary>
+        /// 恒流电流最小值预警
+        /// </summary>
+        public decimal earlycurrent_min => current_min + (current_max - current_min) * earlyWarning;
+
+        /// <summary>
+        /// 恒流电流最大值预警
+        /// </summary>
+        public decimal earlycurrent_max => current_max - (current_max - current_min) * earlyWarning;
+
+        /// <summary>
+        /// 恒流电压最小值预警
+        /// </summary>
+        public decimal earlyvoltage_min => voltage_min + (voltage_max - voltage_min) * earlyWarning;
+
+        /// <summary>
+        /// 恒流电压最大值预警
+        /// </summary>
+        public decimal earlyvoltage_max => voltage_max - (voltage_max - voltage_min) * earlyWarning;
+
+
         /// <summary>
         /// 是否显示“模式不一致”默认是false，如果结果true，那么就显示这几个字
         /// </summary>
@@ -276,26 +344,38 @@ namespace EdgeGateway
         /// </summary>
         public string taskId { get; set; }
 
+
         /// <summary>
         /// 脉冲峰值电流
         /// </summary>
         public decimal maxCurrent { get; set; }
         public bool maxCurrentexceed { get; set; }
+        public bool maxCurrentexceedYujing { get; set; }
+
+
         /// <summary>
         /// 脉冲基值电流
         /// </summary>
         public decimal minCurrent { get; set; }
         public bool minCurrentexceed { get; set; }
+        public bool minCurrentexceedYujing { get; set; }
+
+
         /// <summary>
         /// 脉冲峰值电压
         /// </summary>
         public decimal maxVoltage { get; set; }
         public bool maxVoltageexceed { get; set; }
+        public bool maxVoltageexceedYujing { get; set; }
+
+
         /// <summary>
         /// 脉冲基值电压
         /// </summary>
         public decimal minVoltage { get; set; }
         public bool minVoltageexceed { get; set; }
+        public bool minVoltageexceedYujing { get; set; }
+
 
 
         /// <summary>
@@ -303,11 +383,13 @@ namespace EdgeGateway
         /// </summary>
         public decimal medianCurrent { get; set; }
         public bool medianCurrentexceed { get; set; }
+        public bool medianCurrentexceedYujing { get; set; }
         /// <summary>
         /// 恒流电压
         /// </summary>
         public decimal medianVoltage { get; set; }
         public bool medianVoltageexceed { get; set; }
+        public bool medianVoltageexceedYujing { get; set; }
     }
 
     /// <summary>

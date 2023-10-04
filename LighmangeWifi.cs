@@ -114,14 +114,14 @@ namespace EdgeGateway
 
         /// <summary>
         /// 喇叭开着
-        /// 1 电压报警  颜色红色，电压短音
-        /// 2 电流报警  颜色黄色，电流长音
+        /// 1 阈值报警  颜色红色，电压长音
+        /// 2 预警报警  颜色黄色，电流短音
         /// 3 报警同时存在  颜色红黄色，电流长音
-        /// 4 有任务 颜色绿灯 停止报警 
+        /// 4 没有任务 颜色绿灯 停止报警 
         /// 喇叭关着
-        /// 5 电压报警  颜色红色，电压短音
-        /// 6 电流报警  颜色黄色，电流长音
-        /// 7 报警同时存在  颜色红黄色，电流长音
+        /// 5 阈值报警  颜色红色
+        /// 6 预警报警  颜色黄色
+        /// 7 报警同时存在  颜色红黄色
         /// 8 有任务 颜色绿灯 停止报警 
         /// 0 没有报警 关灯，停止报警
         /// </summary>
@@ -144,11 +144,11 @@ namespace EdgeGateway
                     break;
                 case 1:
                     result &= SetLampColor("100");//红灯
-                    result &= SetLampBuzz("2");//短音
+                    result &= SetLampBuzz("1");//长音
                     break;
                 case 2:
                     result &= SetLampColor("010");//黄灯
-                    result &= SetLampBuzz("1");//长音
+                    result &= SetLampBuzz("2");//短音
                     break;
                 case 3:
                     result &= SetLampColor("110");//红黄灯都亮

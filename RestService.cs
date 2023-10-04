@@ -167,37 +167,37 @@ namespace EdgeGateway
                 task.Start();
             }
 
-            {
-                var task2 = new Task(() =>
-                {
-                    while (true)
-                    {
-                        //三十秒刷新一次平台的接口
-                        //HttpGetIOTConnect();
+            //{
+            //    var task2 = new Task(() =>
+            //    {
+            //        while (true)
+            //        {
+            //            //三十秒刷新一次平台的接口
+            //            HttpGetIOTConnect();
 
-                        HttpGetIOTConnectCpro();
+            //            //HttpGetIOTConnectCpro();
 
-                        Task.Delay(30000).Wait();
-                    }
+            //            Task.Delay(30000).Wait();
+            //        }
 
-                });
-                task2.Start();
-            }
+            //    });
+            //    task2.Start();
+            //}
 
-            {
-                var task2 = new Task(() =>
-                {
-                    while (true)
-                    {
-                        //HttpGetDeviceInitConnect();
-                        HttpGetDeviceInitConnectCpro();
+            //{
+            //    var task2 = new Task(() =>
+            //    {
+            //        while (true)
+            //        {
+            //            HttpGetDeviceInitConnect();
+            //            //HttpGetDeviceInitConnectCpro();
 
-                        Task.Delay(30000).Wait();
-                    }
+            //            Task.Delay(30000).Wait();
+            //        }
 
-                });
-                task2.Start();
-            }
+            //    });
+            //    task2.Start();
+            //}
 
         }
 
@@ -465,7 +465,6 @@ namespace EdgeGateway
                     var data = response.Content.ReadAsStringAsync().Result;
                     //data = "[]";
 
-
                     if (data != null && data.Length > 10)
                     {
                         logger.Info($"任务接口: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
@@ -717,10 +716,24 @@ namespace EdgeGateway
                                                 {
                                                     _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
                                                 }
+
+                                                //如果脉冲电压小于预警设定值
+                                                if (_edgeGatewayModel.CVWMInfo.minVoltage< _edgeGatewayModel.TaskInfo.earlyvoltage_base)
+                                                {
+                                                    if (!_edgeGatewayModel.CVWMInfo.minVoltageexceedYujing)
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = false;
+                                                }
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
+                                                _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing= false;
                                             }
 
                                             break;
@@ -747,10 +760,24 @@ namespace EdgeGateway
                                                 {
                                                     _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
                                                 }
+
+                                                //如果脉冲电压大于预警设定值
+                                                if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_peak)
+                                                {
+                                                    if (!_edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing)
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = false;
+                                                }
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
+                                                _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = false;
                                             }
 
                                             break;
@@ -777,10 +804,24 @@ namespace EdgeGateway
                                                 {
                                                     _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
                                                 }
+
+                                                //如果脉冲电流小于预警
+                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.earlycurrent_base)
+                                                {
+                                                    if (!_edgeGatewayModel.CVWMInfo.minCurrentexceedYujing)
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = false;
+                                                }
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
+                                                _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = false;
                                             }
 
                                             break;
@@ -806,10 +847,24 @@ namespace EdgeGateway
                                                 {
                                                     _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
                                                 }
+
+                                                //如果脉冲电流大于预警
+                                                if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.earlycurrent_peak)
+                                                {
+                                                    if (!_edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing)
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = false;
+                                                }
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
+                                                _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = false;
                                             }
 
                                             break;
@@ -825,7 +880,7 @@ namespace EdgeGateway
                                             //存在任务，并且任务的峰值基值阈值大于0，并且恒流电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0 && _edgeGatewayModel.TaskInfo.voltage_base > 0 && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10)
                                             {
-                                                //如果恒流电压大于 脉冲阈值最大值或者如果恒流电压小于于 阈值最小值
+                                                //如果恒流电压大于 脉冲阈值最大值，或者如果恒流电压小于 阈值最小值
                                                 if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
                                                  || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
 
@@ -839,10 +894,26 @@ namespace EdgeGateway
                                                 {
                                                     _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
                                                 }
+
+                                                //如果恒流电压小于 最小值预警,或者恒流电压大于 最大值预警
+                                                if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_max
+                                                    || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.earlyvoltage_min)
+                                                {
+                                                    if (!_edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing)
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = false;
+                                                }
+
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
+                                                _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = false;
                                             }
 
                                             break;
@@ -936,7 +1007,7 @@ namespace EdgeGateway
                 }
                 catch (Exception ex)
                 {
-                    isconnect=false;
+                    isconnect = false;
                     _edgeGatewayModel.IOTConnectInfo.result = isconnect;
 
                     logger.Error($"{"HttpGetIOTConnectError:" + ex.Message}");
@@ -963,7 +1034,7 @@ namespace EdgeGateway
                     var response = httpClient.GetAsync(url1).Result;
                     var data = response.Content.ReadAsStringAsync().Result;
 
-                    if (data != null&& data== "OK")
+                    if (data != null && data == "OK")
                     {
                         isconnect = true;
                     }
@@ -1125,7 +1196,7 @@ namespace EdgeGateway
                         logger.Info($"设备连接状态: {DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据: {data}");
 
                         //1 连接状态  0 断开状态
-                        if (data.ToString()=="1")
+                        if (data.ToString() == "1")
                         {
                             isconnect = true;
                         }
@@ -1312,150 +1383,194 @@ namespace EdgeGateway
         /// <summary>
         /// 改变灯和喇叭的状态
         /// </summary>
+        //private void SetLampStatus()
+        //{
+        //    //选则USB灯
+        //    if (_edgeGatewayModel.LampManageMode == "1")
+        //    {
+        //        //wifi灯关闭
+        //        if (_lampManageWifi != null)
+        //        {
+        //            //关灯，停止报警
+        //            _lampManageWifi.SetLampStatus(0);
+        //        }
+
+        //        //如果灯存在
+        //        if (_lampManageUSB != null)
+        //        {
+        //            //如果有任务
+        //            if (_edgeGatewayModel.HasTask)
+        //            {
+        //                //喇叭开着
+        //                if (_lampManageUSB._isUseBuzz)
+        //                {
+        //                    //电压超电流不超
+        //                    if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(1);
+        //                    }
+        //                    //电流超电压不超
+        //                    else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(2);
+        //                    }
+        //                    //电压和电流都超
+        //                    else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(3);
+        //                    }
+        //                    //电流电压都不超
+        //                    else
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(4);
+        //                    }
+        //                }
+        //                //喇叭关着
+        //                else
+        //                {
+        //                    //电压超电流不超
+        //                    if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(5);
+        //                    }
+        //                    //电流超电压不超
+        //                    else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(6);
+        //                    }
+        //                    //电压和电流都超
+        //                    else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(7);
+        //                    }
+        //                    //电流电压都不超
+        //                    else
+        //                    {
+        //                        _lampManageUSB.SetLampStatus(8);
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //关灯，停止报警
+        //                _lampManageUSB.SetLampStatus(0);
+        //            }
+        //        }
+        //    }
+
+        //    //Wifi灯
+        //    else if (_edgeGatewayModel.LampManageMode == "0")
+        //    {
+        //        //本地灯关闭
+        //        if (_lampManageUSB != null)
+        //        {
+        //            _lampManageUSB.SetLampStatus(0);
+        //        }
+
+        //        //如果灯存在
+        //        if (_lampManageWifi != null)
+        //        {
+        //            //如果有任务
+        //            if (_edgeGatewayModel.HasTask)
+        //            {
+        //                //喇叭开着
+        //                if (_lampManageWifi._isUseBuzz)
+        //                {
+        //                    //电压超电流不超
+        //                    if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(1);
+        //                    }
+        //                    //电流超电压不超
+        //                    else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(2);
+        //                    }
+        //                    //电压和电流都超
+        //                    else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(3);
+        //                    }
+        //                    //电流电压都不超
+        //                    else
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(4);
+        //                    }
+        //                }
+        //                //喇叭关着
+        //                else
+        //                {
+        //                    //电压超电流不超
+        //                    if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(5);
+        //                    }
+        //                    //电流超电压不超
+        //                    else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(6);
+        //                    }
+        //                    //电压和电流都超
+        //                    else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(7);
+        //                    }
+        //                    //电流电压都不超
+        //                    else
+        //                    {
+        //                        _lampManageWifi.SetLampStatus(8);
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //关灯，停止报警
+        //                _lampManageWifi.SetLampStatus(0);
+        //            }
+        //        }
+        //    }
+        //}
+
         private void SetLampStatus()
         {
-            //选则USB灯
-            if (_edgeGatewayModel.LampManageMode == "1")
+            if (_lampManageWifi != null)
             {
-                //wifi灯关闭
-                if (_lampManageWifi != null)
+                //如果有任务
+                if (_edgeGatewayModel.HasTask)
+                {
+                    //喇叭开着
+                    if (_lampManageWifi._isUseBuzz)
+                    {
+                        //电压超或者电流超（阈值）
+                        if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(1);
+                        }
+                        //电流电压都不超
+                        else
+                        {
+                            _lampManageWifi.SetLampStatus(4);
+                        }
+                    }
+                    //喇叭关着
+                    else
+                    {
+                        //电压超或者电流超(阈值)
+                        if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(5);
+                        }
+                        //电流电压都不超
+                        else
+                        {
+                            _lampManageWifi.SetLampStatus(8);
+                        }
+                    }
+                }
+                else
                 {
                     //关灯，停止报警
                     _lampManageWifi.SetLampStatus(0);
-                }
-
-                //如果灯存在
-                if (_lampManageUSB != null)
-                {
-                    //如果有任务
-                    if (_edgeGatewayModel.HasTask)
-                    {
-                        //喇叭开着
-                        if (_lampManageUSB._isUseBuzz)
-                        {
-                            //电压超电流不超
-                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(1);
-                            }
-                            //电流超电压不超
-                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(2);
-                            }
-                            //电压和电流都超
-                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(3);
-                            }
-                            //电流电压都不超
-                            else
-                            {
-                                _lampManageUSB.SetLampStatus(4);
-                            }
-                        }
-                        //喇叭关着
-                        else
-                        {
-                            //电压超电流不超
-                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(5);
-                            }
-                            //电流超电压不超
-                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(6);
-                            }
-                            //电压和电流都超
-                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageUSB.SetLampStatus(7);
-                            }
-                            //电流电压都不超
-                            else
-                            {
-                                _lampManageUSB.SetLampStatus(8);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //关灯，停止报警
-                        _lampManageUSB.SetLampStatus(0);
-                    }
-                }
-            }
-
-            //Wifi灯
-            else if (_edgeGatewayModel.LampManageMode == "0")
-            {
-                //本地灯关闭
-                if (_lampManageUSB != null)
-                {
-                    _lampManageUSB.SetLampStatus(0);
-                }
-
-                //如果灯存在
-                if (_lampManageWifi != null)
-                {
-                    //如果有任务
-                    if (_edgeGatewayModel.HasTask)
-                    {
-                        //喇叭开着
-                        if (_lampManageWifi._isUseBuzz)
-                        {
-                            //电压超电流不超
-                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(1);
-                            }
-                            //电流超电压不超
-                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(2);
-                            }
-                            //电压和电流都超
-                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(3);
-                            }
-                            //电流电压都不超
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(4);
-                            }
-                        }
-                        //喇叭关着
-                        else
-                        {
-                            //电压超电流不超
-                            if (_edgeGatewayModel.IsVoltageAlarm && !_edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(5);
-                            }
-                            //电流超电压不超
-                            else if (!_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(6);
-                            }
-                            //电压和电流都超
-                            else if (_edgeGatewayModel.IsVoltageAlarm && _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(7);
-                            }
-                            //电流电压都不超
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(8);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //关灯，停止报警
-                        _lampManageWifi.SetLampStatus(0);
-                    }
                 }
             }
         }
@@ -1488,6 +1603,42 @@ namespace EdgeGateway
                     _edgeGatewayModel.LampManageMode = line.ToString();
                 }
             }
+        }
+
+        public void setEarlyWarning(decimal uName)
+        {
+            try
+            {
+                StreamWriter sw = new StreamWriter(Application.StartupPath + "\\EarlyWarning.txt", false);
+
+                _edgeGatewayModel.earlyWarning = uName;
+
+                sw.WriteLine(uName);
+                sw.Close();//写入
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public string getEarlyWarning()
+        {
+            string str;
+            StreamReader sr = new StreamReader(Application.StartupPath + "\\EarlyWarning.txt", false);
+            str = sr.ReadLine().ToString();
+            _edgeGatewayModel.earlyWarning = Convert.ToDecimal(str);
+
+            sr.Close();
+
+            return str;
+        }
+
+        public void ExitExt(string uName)
+        {
+
+            Application.Exit();
+
+            throw new NotImplementedException();
         }
 
         /// <summary>

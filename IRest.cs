@@ -14,6 +14,13 @@ namespace EdgeGateway
         [WebGet(UriTemplate = "/exit", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void Exit();
 
+        /// <summary>
+        /// 关闭带参数
+        /// </summary>
+        [OperationContract]
+        [WebGet(UriTemplate = "/exitExt?name={uName}", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void ExitExt(string uName);
+
         [OperationContract]
         [WebGet(UriTemplate = "/getControl", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         string GetControl();
@@ -73,6 +80,25 @@ namespace EdgeGateway
         [OperationContract]
         [WebGet(UriTemplate = "/getHasTaskLampMode", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void getHasTaskLampMode();
+
+
+
+        /// <summary>
+        /// 预警数值
+        /// </summary>
+        /// <param name="uName"></param>
+        [OperationContract]
+        [WebGet(UriTemplate = "/setEarlyWarning?name={uName}", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void setEarlyWarning(decimal uName);
+
+
+        /// <summary>
+        /// 获取上次预警数值
+        /// </summary>
+        /// <param name="uName"></param>
+        [OperationContract]
+        [WebGet(UriTemplate = "/getEarlyWarning", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        string getEarlyWarning();
 
 
         [OperationContract]
