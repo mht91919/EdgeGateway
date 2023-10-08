@@ -19,7 +19,9 @@ namespace EdgeGateway
         /// </summary>
         [OperationContract]
         [WebGet(UriTemplate = "/exitExt?name={uName}", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        void ExitExt(string uName);
+        string ExitExt(string uName);
+
+
 
         [OperationContract]
         [WebGet(UriTemplate = "/getControl", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
