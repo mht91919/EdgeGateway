@@ -568,38 +568,38 @@ namespace EdgeGateway
                                     case "wps_current_min":
                                         decimal currentbase = 0;
                                         decimal.TryParse(item.First.ToString(), out currentbase);
-                                        //_edgeGatewayModel.TaskInfo.current_base = currentbase;
+                                        _edgeGatewayModel.TaskInfo.current_base = currentbase;
 
                                         decimal currentmin = 0;
                                         decimal.TryParse(item.First.ToString(), out currentmin);
-                                        //_edgeGatewayModel.TaskInfo.current_min = currentmin;
+                                        _edgeGatewayModel.TaskInfo.current_min = currentmin;
                                         break;
                                     case "wps_current_max":
                                         decimal currentpeak = 0;
                                         decimal.TryParse(item.First.ToString(), out currentpeak);
-                                        //_edgeGatewayModel.TaskInfo.current_peak = currentpeak;
+                                        _edgeGatewayModel.TaskInfo.current_peak = currentpeak;
 
                                         decimal currentmax = 0;
                                         decimal.TryParse(item.First.ToString(), out currentmax);
-                                        //_edgeGatewayModel.TaskInfo.current_max = currentmax;
+                                        _edgeGatewayModel.TaskInfo.current_max = currentmax;
                                         break;
                                     case "wps_voltage_min":
                                         decimal voltagebase = 0;
                                         decimal.TryParse(item.First.ToString(), out voltagebase);
-                                        //_edgeGatewayModel.TaskInfo.voltage_base = voltagebase;
+                                        _edgeGatewayModel.TaskInfo.voltage_base = voltagebase;
 
                                         decimal voltagemin = 0;
                                         decimal.TryParse(item.First.ToString(), out voltagemin);
-                                        // _edgeGatewayModel.TaskInfo.voltage_min = voltagemin;
+                                        _edgeGatewayModel.TaskInfo.voltage_min = voltagemin;
                                         break;
                                     case "wps_voltage_max":
                                         decimal voltagepeak = 0;
                                         decimal.TryParse(item.First.ToString(), out voltagepeak);
-                                        //_edgeGatewayModel.TaskInfo.voltage_peak = voltagepeak;
+                                        _edgeGatewayModel.TaskInfo.voltage_peak = voltagepeak;
 
                                         decimal voltagemax = 0;
                                         decimal.TryParse(item.First.ToString(), out voltagemax);
-                                        //_edgeGatewayModel.TaskInfo.voltage_max = voltagemax;
+                                        _edgeGatewayModel.TaskInfo.voltage_max = voltagemax;
                                         break;
                                 }
                             }
@@ -709,35 +709,32 @@ namespace EdgeGateway
 
                                             decimal minVoltage = 0;
                                             decimal.TryParse(item.First.ToString(), out minVoltage);
+
                                             _edgeGatewayModel.CVWMInfo.minVoltage = minVoltage;
                                             //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_base > 0
-                                                //&& _edgeGatewayModel.CVWMInfo.minCurrent >= 10
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10
                                                 )
                                             {
-                                                //如果脉冲电压小于 脉冲阈值最小值
-                                                if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.minVoltageexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.minVoltageexceed = true;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
-                                                }
-
-                                                //如果脉冲电压小于预警设定值
+                                                //脉冲电压 小于 预警设定值
                                                 if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.earlyvoltage_base)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.minVoltageexceedYujing)
+                                                    //并且 脉冲电压 小于 脉冲阈值最小值
+                                                    if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
                                                     {
+                                                        _edgeGatewayModel.CVWMInfo.minVoltageexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = false;
                                                 }
                                             }
@@ -746,7 +743,6 @@ namespace EdgeGateway
                                                 _edgeGatewayModel.CVWMInfo.minVoltageexceed = false;
                                                 _edgeGatewayModel.CVWMInfo.minVoltageexceedYujing = false;
                                             }
-
                                             break;
                                         case "maxVoltage":
 
@@ -754,35 +750,30 @@ namespace EdgeGateway
                                             decimal.TryParse(item.First.ToString(), out maxVoltage);
 
                                             _edgeGatewayModel.CVWMInfo.maxVoltage = maxVoltage;
-
+                                            //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0
-                                                //&& _edgeGatewayModel.CVWMInfo.minCurrent >= 10\
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10
                                                 )
                                             {
-                                                //如果脉冲电压大于 脉冲阈值最大值
-                                                if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.voltage_peak)
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.maxVoltageexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceed = true;
-
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
-                                                }
-
                                                 //如果脉冲电压大于预警设定值
                                                 if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_peak)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing)
+                                                    //并且 如果脉冲电压 大于 脉冲阈值最大值
+                                                    if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.voltage_peak)
                                                     {
+                                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = false;
                                                 }
                                             }
@@ -791,7 +782,6 @@ namespace EdgeGateway
                                                 _edgeGatewayModel.CVWMInfo.maxVoltageexceed = false;
                                                 _edgeGatewayModel.CVWMInfo.maxVoltageexceedYujing = false;
                                             }
-
                                             break;
                                         case "minCurrent":
 
@@ -801,33 +791,29 @@ namespace EdgeGateway
                                             _edgeGatewayModel.CVWMInfo.minCurrent = minCurrent;
                                             //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_base > 0
-                                                //&& _edgeGatewayModel.CVWMInfo.minCurrent >= 10
+                                                && _edgeGatewayModel.CVWMInfo.minCurrent >= 10
                                                 )
                                             {
-                                                //如果脉冲电流小于 脉冲阈值最小值
-                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base
-                                                    )
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.minCurrentexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.minCurrentexceed = true;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
-                                                }
-
-                                                //如果脉冲电流小于预警
+                                                //脉冲电流 小于 预警
                                                 if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.earlycurrent_base)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.minCurrentexceedYujing)
+                                                    //并且 脉冲电流 小于 脉冲阈值最小值
+                                                    if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base
+                                                        )
                                                     {
+                                                        _edgeGatewayModel.CVWMInfo.minCurrentexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = false;
                                                 }
                                             }
@@ -836,41 +822,37 @@ namespace EdgeGateway
                                                 _edgeGatewayModel.CVWMInfo.minCurrentexceed = false;
                                                 _edgeGatewayModel.CVWMInfo.minCurrentexceedYujing = false;
                                             }
-
                                             break;
+
                                         case "maxCurrent":
 
                                             decimal maxCurrent = 0;
                                             decimal.TryParse(item.First.ToString(), out maxCurrent);
 
                                             _edgeGatewayModel.CVWMInfo.maxCurrent = maxCurrent;
-
-                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0)
+                                            //存在任务，并且任务的阈值大于0，并且脉冲基值电流大于等于10A
+                                            if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0
+                                                 && _edgeGatewayModel.CVWMInfo.minCurrent >= 10)
                                             {
-                                                //如果脉冲电流大于 脉冲阈值最大值
-                                                if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.current_peak)
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.maxCurrentexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceed = true;
-                                                    }
-
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
-                                                }
-
-                                                //如果脉冲电流大于预警
+                                                //脉冲电流大于预警
                                                 if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.earlycurrent_peak)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing)
+                                                    //并且 脉冲电流 大于 脉冲阈值最大值
+                                                    if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.current_peak)
                                                     {
+                                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = false;
                                                 }
                                             }
@@ -879,9 +861,7 @@ namespace EdgeGateway
                                                 _edgeGatewayModel.CVWMInfo.maxCurrentexceed = false;
                                                 _edgeGatewayModel.CVWMInfo.maxCurrentexceedYujing = false;
                                             }
-
                                             break;
-
 
                                         case "medianVoltage":
                                         case "averageVoltage":
@@ -892,46 +872,41 @@ namespace EdgeGateway
                                             _edgeGatewayModel.CVWMInfo.medianVoltage = medianVoltage;
                                             //存在任务，并且任务的峰值基值阈值大于0，并且恒流电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.voltage_peak > 0 && _edgeGatewayModel.TaskInfo.voltage_base > 0
-                                                //&& _edgeGatewayModel.CVWMInfo.medianCurrent >= 10
+                                                && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10
                                                 )
                                             {
-                                                //如果恒流电压大于 脉冲阈值最大值，或者如果恒流电压小于 阈值最小值
-                                                if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
-                                                 || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
-
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.medianVoltageexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceed = true;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
-                                                }
-
-                                                //如果恒流电压小于 最小值预警,或者恒流电压大于 最大值预警
+                                                //恒流电压 小于 最小值预警,或者恒流电压 大于 最大值预警
                                                 if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_max
                                                     || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.earlyvoltage_min)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing)
+                                                    //并且恒流电压 大于 脉冲阈值最大值，或者恒流电压 小于 阈值最小值
+                                                    if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
+                                                     || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
+
                                                     {
+                                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = false;
                                                 }
-
                                             }
                                             else
                                             {
                                                 _edgeGatewayModel.CVWMInfo.medianVoltageexceed = false;
                                                 _edgeGatewayModel.CVWMInfo.medianVoltageexceedYujing = false;
                                             }
-
                                             break;
+
                                         case "medianCurrent":
                                         case "averageCurrent":
 
@@ -942,39 +917,33 @@ namespace EdgeGateway
                                             //存在任务，并且任务的基值阈值大于0，并且恒流电流大于等于10A
                                             if (_edgeGatewayModel.HasTask && _edgeGatewayModel.TaskInfo.current_peak > 0
                                                 && _edgeGatewayModel.TaskInfo.current_base > 0
-                                                //&& _edgeGatewayModel.CVWMInfo.medianCurrent >= 10
+                                                && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10
                                                 )
                                             {
-                                                //如果恒流电流大于 阈值最大值或者如果恒流电流小于于 阈值最小值
-                                                if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
-                                                  || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.current_base)
-                                                {
-                                                    if (!_edgeGatewayModel.CVWMInfo.medianCurrentexceed)
-                                                    {
-                                                        _edgeGatewayModel.CVWMInfo.medianCurrentexceed = true;
-                                                    }
-
-                                                }
-                                                else
-                                                {
-                                                    _edgeGatewayModel.CVWMInfo.medianCurrentexceed = false;
-                                                }
-
-                                                //如果恒流电流小于 最小值预警,或者恒流电流大于 最大值预警
+                                                //恒流电流 小于 最小值预警,或者 恒流电流 大于 最大值预警
                                                 if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.earlycurrent_max
                                                     || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.earlycurrent_min)
                                                 {
-                                                    if (!_edgeGatewayModel.CVWMInfo.medianCurrentexceedYujing)
+                                                    //并且 恒流电流 大于 阈值最大值 或者 恒流电流 小于 阈值最小值
+                                                    if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
+                                                      || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.current_base)
                                                     {
+
+                                                        _edgeGatewayModel.CVWMInfo.medianCurrentexceed = true;
+                                                        _edgeGatewayModel.CVWMInfo.medianCurrentexceedYujing = false;
+                                                    }
+                                                    //超预警，不超报警
+                                                    else
+                                                    {
+                                                        _edgeGatewayModel.CVWMInfo.medianCurrentexceed = false;
                                                         _edgeGatewayModel.CVWMInfo.medianCurrentexceedYujing = true;
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    _edgeGatewayModel.CVWMInfo.medianCurrentexceed = false;
                                                     _edgeGatewayModel.CVWMInfo.medianCurrentexceedYujing = false;
                                                 }
-
-
                                             }
                                             else
                                             {
@@ -1575,37 +1544,27 @@ namespace EdgeGateway
                     //喇叭开着
                     if (_lampManageWifi._isUseBuzz)
                     {
-                        //电压超或者电流超（阈值）
-                        if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
+                        //报警,不预警
+                        if (_edgeGatewayModel.IsCurrentVoltageAlarm && !_edgeGatewayModel.IsCurrentVoltageAlarmYujing)
                         {
-                            //并且（电压超或者电流超(预警)）
-                            if (_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing)
-                            {
-                                _lampManageWifi.SetLampStatus(3);
-                            }
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(1);
-                            }
+                            logger.Info($"{"喇叭开，报警:" + 1550}");
+
+                            _lampManageWifi.SetLampStatus(1);
                         }
 
-                        //电压超或者电流超(预警)
-                        if (_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing)
+                        //预警，不报警
+                        if (_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
                         {
-                            //并且（电压超或者电流超(阈值)）
-                            if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(3);
-                            }
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(2);
-                            }
+                            logger.Info($"{"喇叭开，预警:" + 1580}");
+
+                            _lampManageWifi.SetLampStatus(2);
                         }
 
-                        if (!(_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm
-                            || _edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing))
+                        //不报警也不预警
+                        if (!_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
                         {
+                            logger.Info($"{"喇叭开，不报警:" + 1566}");
+
                             _lampManageWifi.SetLampStatus(4);
                         }
                     }
@@ -1613,43 +1572,34 @@ namespace EdgeGateway
                     //喇叭关着
                     else
                     {
-                        //电压超或者电流超（阈值）
-                        if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
+                        //报警,不预警
+                        if (_edgeGatewayModel.IsCurrentVoltageAlarm && !_edgeGatewayModel.IsCurrentVoltageAlarmYujing)
                         {
-                            //并且（电压超或者电流超(预警)）
-                            if (_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing)
-                            {
-                                _lampManageWifi.SetLampStatus(7);
-                            }
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(5);
-                            }
+                            logger.Info($"{"喇叭开，报警:" + 1578}");
+
+                            _lampManageWifi.SetLampStatus(5);
                         }
 
-                        //电压超或者电流超(预警)
-                        if (_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing)
+                        //预警，不报警
+                        if (_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
                         {
-                            //并且（电压超或者电流超(阈值)）
-                            if (_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm)
-                            {
-                                _lampManageWifi.SetLampStatus(7);
-                            }
-                            else
-                            {
-                                _lampManageWifi.SetLampStatus(6);
-                            }
+                            logger.Info($"{"喇叭开，预警:" + 1586}");
+
+                            _lampManageWifi.SetLampStatus(6);
                         }
 
-                        if (!(_edgeGatewayModel.IsVoltageAlarm || _edgeGatewayModel.IsCurrentAlarm
-                            || _edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsCurrentAlarmYujing))
+                        //不报警也不预警
+                        if (!_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
                         {
+                            logger.Info($"{"喇叭开，不报警:" + 1598}");
+
                             _lampManageWifi.SetLampStatus(4);
                         }
                     }
                 }
                 else
                 {
+                    logger.Info($"{"关灯，停止报警:" + 1603}");
                     //关灯，停止报警
                     _lampManageWifi.SetLampStatus(0);
                 }
@@ -1687,15 +1637,13 @@ namespace EdgeGateway
         }
 
 
-
-
         public void setEarlyWarning(decimal uName)
         {
             try
             {
                 StreamWriter sw = new StreamWriter(Application.StartupPath + "\\EarlyWarning.txt", false);
 
-                _edgeGatewayModel.TaskInfo.earlyWarning = uName;
+                _edgeGatewayModel.TaskInfo.earlyWarningS = uName;
 
                 sw.WriteLine(uName);
                 sw.Close();//写入
@@ -1709,8 +1657,8 @@ namespace EdgeGateway
         {
             string str;
             StreamReader sr = new StreamReader(Application.StartupPath + "\\EarlyWarning.txt", false);
-            str = sr.ReadLine().ToString();
-            _edgeGatewayModel.TaskInfo.earlyWarning = Convert.ToDecimal(str);
+            str = sr.ReadLine();
+            _edgeGatewayModel.TaskInfo.earlyWarningS = Convert.ToDecimal(str);
 
             sr.Close();
 
