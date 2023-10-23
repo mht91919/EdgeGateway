@@ -83,8 +83,6 @@ namespace EdgeGateway
         [WebGet(UriTemplate = "/getHasTaskLampMode", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void getHasTaskLampMode();
 
-
-
         /// <summary>
         /// 预警数值
         /// </summary>
@@ -93,7 +91,6 @@ namespace EdgeGateway
         [WebGet(UriTemplate = "/setEarlyWarning?name={uName}", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void setEarlyWarning(decimal uName);
 
-
         /// <summary>
         /// 获取上次预警数值
         /// </summary>
@@ -101,7 +98,6 @@ namespace EdgeGateway
         [OperationContract]
         [WebGet(UriTemplate = "/getEarlyWarning", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         string getEarlyWarning();
-
 
         [OperationContract]
         [WebGet(UriTemplate = "/getHasTaskWeldingMode", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]

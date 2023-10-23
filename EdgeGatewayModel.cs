@@ -8,7 +8,107 @@ namespace EdgeGateway
 {
     public class EdgeGatewayModel
     {
-        public string exitpassword { get; set; }
+        public decimal earlyWarningS { get; set; }
+
+        /// <summary>
+        /// 脉冲电流基值预警
+        /// </summary>
+        public string earlycurrent_base
+        {
+            get
+            {
+                return (TaskInfo.current_base + (TaskInfo.current_peak - TaskInfo.current_base) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        /// 脉冲电流峰值预警
+        /// </summary>
+        public string earlycurrent_peak
+        {
+            get
+            {
+                return (TaskInfo.current_peak - (TaskInfo.current_peak - TaskInfo.current_base) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        ///  脉冲电压基值预警
+        /// </summary>
+        public string earlyvoltage_base
+        {
+            get
+            {
+                return (TaskInfo.voltage_base + (TaskInfo.voltage_peak - TaskInfo.voltage_base) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        /// 脉冲电压峰值预警
+        /// </summary>
+        public string earlyvoltage_peak
+        {
+            get
+            {
+                return (TaskInfo.voltage_peak - (TaskInfo.voltage_peak - TaskInfo.voltage_base) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+
+
+        /// <summary>
+        /// 恒流电流最小值预警
+        /// </summary>
+        public string earlycurrent_min
+        {
+            get
+            {
+                return (TaskInfo.current_min + (TaskInfo.current_max - TaskInfo.current_min) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        /// 恒流电流最大值预警
+        /// </summary>
+        public string earlycurrent_max
+        {
+            get
+            {
+                return (TaskInfo.current_max - (TaskInfo.current_max - TaskInfo.current_min) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        /// 恒流电压最小值预警
+        /// </summary>
+        public string earlyvoltage_min
+        {
+            get
+            {
+                return (TaskInfo.voltage_min + (TaskInfo.voltage_max - TaskInfo.voltage_min) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        /// <summary>
+        /// 恒流电压最大值预警
+        /// </summary>
+        public string earlyvoltage_max
+        {
+            get
+            {
+                return (TaskInfo.voltage_max - (TaskInfo.voltage_max - TaskInfo.voltage_min) / 2 * earlyWarningS / 100).ToString();
+            }
+            set { }
+        }
+
+        public string Bywgpwd { get; set; }
 
         /// <summary>
         /// 当前绑定的设备编码
@@ -103,7 +203,7 @@ namespace EdgeGateway
     /// </summary>
     public class TaskInfo
     {
-        public decimal earlyWarningS { get; set; } = 10;
+        public decimal earlyWarningS { get; set; }
 
 
         /// <summary>
@@ -250,42 +350,42 @@ namespace EdgeGateway
         /// <summary>
         /// 电流阈值最小值
         /// </summary>
-        public decimal current_min { get; set; } = 10;
+        public decimal current_min { get; set; }
 
         /// <summary>
         ///  电流阈值最大值
         /// </summary>
-        public decimal current_max { get; set; } = 50;
+        public decimal current_max { get; set; }
 
         /// <summary>
         /// 电压阈值最小值
         /// </summary>
-        public decimal voltage_min { get; set; } = 10;
+        public decimal voltage_min { get; set; }
         /// <summary>
         /// 电压阈值最大值
         /// </summary>
-        public decimal voltage_max { get; set; } = 50;
+        public decimal voltage_max { get; set; }
 
 
         /// <summary>
         /// 电流阈基值最小值
         /// </summary>
-        public decimal current_base { get; set; } = 10;
+        public decimal current_base { get; set; }
 
         /// <summary>
         ///  电流峰值最大值
         /// </summary>
-        public decimal current_peak { get; set; } = 50;
+        public decimal current_peak { get; set; }
 
         /// <summary>
         /// 电压基值最小值
         /// </summary>
-        public decimal voltage_base { get; set; } = 10;
+        public decimal voltage_base { get; set; }
         /// <summary>
         /// 电压峰值最大值
         /// </summary>
 
-        public decimal voltage_peak { get; set; } = 50;
+        public decimal voltage_peak { get; set; }
 
     }
 

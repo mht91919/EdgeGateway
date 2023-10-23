@@ -12,6 +12,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
 
 namespace EdgeGateway
 {
@@ -68,6 +69,8 @@ namespace EdgeGateway
             //InitWebSocketDeviceStatus();
 
             getHasTaskLampMode();
+
+            HttpGetBywgpwd();
 
             HttpQueryByCodeAndType();
         }
@@ -194,21 +197,6 @@ namespace EdgeGateway
                 });
                 task2.Start();
             }
-
-            //{
-            //    var task2 = new Task(() =>
-            //    {
-            //        while (true)
-            //        {
-            //            HttpXXXXX();
-
-            //            Task.Delay(1000).Wait();
-            //        }
-
-            //    });
-            //    task2.Start();
-            //}
-
         }
 
         /// <summary>
@@ -217,7 +205,7 @@ namespace EdgeGateway
         /// <returns></returns>
         public EdgeGatewayModel GetTaskInfoNew()
         {
-            //logger.Info($"GetTaskInfoNew:{DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据:  {JsonConvert.SerializeObject(_edgeGatewayModel)}");
+            //logger.Info($"GetTaskInfoNew:{DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")} 接收数据:  {JsonConvert.SerializeObject(_edgeGatewayModel)}");x
 
             return _edgeGatewayModel;
         }
@@ -264,7 +252,7 @@ namespace EdgeGateway
         /// <returns></returns>
         public string GetControl()
         {
-            string str = File.ReadAllText(Application.StartupPath + "\\contaol.json");
+            string str = System.IO.File.ReadAllText(Application.StartupPath + "\\contaol.json");
             //灯初始化
             //lighmange
 
@@ -272,7 +260,7 @@ namespace EdgeGateway
         }
         public JObject GetControlJobj()
         {
-            string str = File.ReadAllText(Application.StartupPath + "\\contaol.json");
+            string str = System.IO.File.ReadAllText(Application.StartupPath + "\\contaol.json");
 
             JObject obj = JsonConvert.DeserializeObject<JObject>(str);
 
@@ -287,7 +275,7 @@ namespace EdgeGateway
         {
             bool flag;
 
-            if (!File.Exists(Application.StartupPath + "\\DeviceNo.txt"))
+            if (!System.IO.File.Exists(Application.StartupPath + "\\DeviceNo.txt"))
             {
                 flag = false;
             }
@@ -421,7 +409,7 @@ namespace EdgeGateway
             nifiWeldMode weldMode = new nifiWeldMode();
 
             //如果文件不存在
-            if (!File.Exists(Application.StartupPath + "\\WeldMode.txt"))
+            if (!System.IO.File.Exists(Application.StartupPath + "\\WeldMode.txt"))
             {
                 weldMode.weldMode = _edgeGatewayModel.WeldMode;
             }
@@ -601,6 +589,7 @@ namespace EdgeGateway
                                         decimal.TryParse(item.First.ToString(), out voltagemax);
                                         _edgeGatewayModel.TaskInfo.voltage_max = voltagemax;
                                         break;
+
                                 }
                             }
                         }
@@ -717,7 +706,7 @@ namespace EdgeGateway
                                                 )
                                             {
                                                 //脉冲电压 小于 预警设定值
-                                                if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.earlyvoltage_base)
+                                                if (_edgeGatewayModel.CVWMInfo.minVoltage < Convert.ToDecimal(_edgeGatewayModel.earlyvoltage_base))
                                                 {
                                                     //并且 脉冲电压 小于 脉冲阈值最小值
                                                     if (_edgeGatewayModel.CVWMInfo.minVoltage < _edgeGatewayModel.TaskInfo.voltage_base)
@@ -756,7 +745,7 @@ namespace EdgeGateway
                                                 )
                                             {
                                                 //如果脉冲电压大于预警设定值
-                                                if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_peak)
+                                                if (_edgeGatewayModel.CVWMInfo.maxVoltage > Convert.ToDecimal(_edgeGatewayModel.earlyvoltage_peak))
                                                 {
                                                     //并且 如果脉冲电压 大于 脉冲阈值最大值
                                                     if (_edgeGatewayModel.CVWMInfo.maxVoltage > _edgeGatewayModel.TaskInfo.voltage_peak)
@@ -795,7 +784,7 @@ namespace EdgeGateway
                                                 )
                                             {
                                                 //脉冲电流 小于 预警
-                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.earlycurrent_base)
+                                                if (_edgeGatewayModel.CVWMInfo.minCurrent < Convert.ToDecimal(_edgeGatewayModel.earlycurrent_base))
                                                 {
                                                     //并且 脉冲电流 小于 脉冲阈值最小值
                                                     if (_edgeGatewayModel.CVWMInfo.minCurrent < _edgeGatewayModel.TaskInfo.current_base
@@ -835,7 +824,7 @@ namespace EdgeGateway
                                                  && _edgeGatewayModel.CVWMInfo.minCurrent >= 10)
                                             {
                                                 //脉冲电流大于预警
-                                                if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.earlycurrent_peak)
+                                                if (_edgeGatewayModel.CVWMInfo.maxCurrent > Convert.ToDecimal(_edgeGatewayModel.earlycurrent_peak))
                                                 {
                                                     //并且 脉冲电流 大于 脉冲阈值最大值
                                                     if (_edgeGatewayModel.CVWMInfo.maxCurrent > _edgeGatewayModel.TaskInfo.current_peak)
@@ -875,9 +864,9 @@ namespace EdgeGateway
                                                 && _edgeGatewayModel.CVWMInfo.medianCurrent >= 10
                                                 )
                                             {
-                                                //恒流电压 小于 最小值预警,或者恒流电压 大于 最大值预警
-                                                if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.earlyvoltage_max
-                                                    || _edgeGatewayModel.CVWMInfo.medianVoltage < _edgeGatewayModel.TaskInfo.earlyvoltage_min)
+                                                ////恒流电压 小于 最小值预警,或者恒流电压 大于 最大值预警
+                                                if (_edgeGatewayModel.CVWMInfo.medianVoltage > Convert.ToDecimal(_edgeGatewayModel.earlyvoltage_max)
+                                                    || _edgeGatewayModel.CVWMInfo.medianVoltage < Convert.ToDecimal(_edgeGatewayModel.earlyvoltage_min))
                                                 {
                                                     //并且恒流电压 大于 脉冲阈值最大值，或者恒流电压 小于 阈值最小值
                                                     if (_edgeGatewayModel.CVWMInfo.medianVoltage > _edgeGatewayModel.TaskInfo.voltage_peak
@@ -921,8 +910,8 @@ namespace EdgeGateway
                                                 )
                                             {
                                                 //恒流电流 小于 最小值预警,或者 恒流电流 大于 最大值预警
-                                                if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.earlycurrent_max
-                                                    || _edgeGatewayModel.CVWMInfo.medianCurrent < _edgeGatewayModel.TaskInfo.earlycurrent_min)
+                                                if (_edgeGatewayModel.CVWMInfo.medianCurrent > Convert.ToDecimal(_edgeGatewayModel.earlycurrent_max)
+                                                    || _edgeGatewayModel.CVWMInfo.medianCurrent < Convert.ToDecimal(_edgeGatewayModel.earlycurrent_min))
                                                 {
                                                     //并且 恒流电流 大于 阈值最大值 或者 恒流电流 小于 阈值最小值
                                                     if (_edgeGatewayModel.CVWMInfo.medianCurrent > _edgeGatewayModel.TaskInfo.current_peak
@@ -1173,6 +1162,12 @@ namespace EdgeGateway
             }
         }
 
+        /*这段代码是一个C#方法，用于通过HTTP GET请求获取设备连接状态。
+         * 首先创建一个HttpClient对象，设置请求头和超时时间。
+         * 然后从配置文件中获取请求路径，发送GET请求并获取响应数据。
+         * 如果响应数据为1，则设备连接状态为true，否则为false。
+         * 最后将设备连接状态保存到_edgeGatewayModel对象中，并记录日志。
+         * 如果发生异常，则将设备连接状态设置为false，并记录错误日志。*/
         public void HttpGetDeviceInitConnectCpro()
         {
             bool isconnect = true;
@@ -1533,7 +1528,7 @@ namespace EdgeGateway
         //        }
         //    }
         //}
-
+        /*这段代码是一个私有方法，用于设置灯的状态。首先判断是否有与WiFi相关的灯管理器，如果有任务，则根据当前电压是否报警或预警来设置灯的状态。如果喇叭开着，则根据报警或预警状态设置灯的状态；如果喇叭关着，则根据报警或预警状态设置灯的状态。如果没有任务，则停止报警并关闭灯。其中，logger是一个记录日志的对象。*/
         private void SetLampStatus()
         {
             if (_lampManageWifi != null)
@@ -1613,7 +1608,7 @@ namespace EdgeGateway
         public void getHasTaskLampMode()
         {
             //如果lamp文件不存在。使用本地的灯
-            if (!File.Exists(Application.StartupPath + "\\LampManageMode.txt"))
+            if (!System.IO.File.Exists(Application.StartupPath + "\\LampManageMode.txt"))
             {
                 _edgeGatewayModel.LampManageMode = "1";
             }
@@ -1636,14 +1631,14 @@ namespace EdgeGateway
             }
         }
 
-
+        /*这段代码定义了一个名为setEarlyWarning的公共方法，该方法接受一个decimal类型的参数uName。该方法的作用是将uName的值写入到应用程序启动路径下的EarlyWarning.txt文件中，并将_edgeGatewayModel对象的earlyWarningS属性设置为uName的值。如果写入过程中出现异常，则不做任何处理。*/
         public void setEarlyWarning(decimal uName)
         {
             try
             {
                 StreamWriter sw = new StreamWriter(Application.StartupPath + "\\EarlyWarning.txt", false);
 
-                _edgeGatewayModel.TaskInfo.earlyWarningS = uName;
+                _edgeGatewayModel.earlyWarningS = uName;
 
                 sw.WriteLine(uName);
                 sw.Close();//写入
@@ -1658,7 +1653,7 @@ namespace EdgeGateway
             string str;
             StreamReader sr = new StreamReader(Application.StartupPath + "\\EarlyWarning.txt", false);
             str = sr.ReadLine();
-            _edgeGatewayModel.TaskInfo.earlyWarningS = Convert.ToDecimal(str);
+            _edgeGatewayModel.earlyWarningS = Convert.ToDecimal(str);
 
             sr.Close();
 
@@ -1667,10 +1662,10 @@ namespace EdgeGateway
 
         public string ExitExt(string uName)
         {
-            if (uName == "AA")
+            if (uName == _edgeGatewayModel.Bywgpwd)
             {
                 Application.Exit();
-                return "AA";
+                return _edgeGatewayModel.Bywgpwd;
             }
             else
             {
@@ -1678,58 +1673,110 @@ namespace EdgeGateway
             }
         }
 
-        //public void HttpXXXXX()
-        //{
-        //    /*
-        //     {"status":200,"msg":"请求成功","result":true}
-        //     */
-        //    bool isconnect = true;
-        //    using (var httpClient = new HttpClient())
-        //    {
-        //        httpClient.Timeout = new TimeSpan(0, 0, 3);
-        //        httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
+        /// <summary>
+        /// HTTP请求获取退出密码
+        /// </summary>
+        public void HttpGetBywgpwd()
+        {
+            /*
+     {
+        "success": true,
+        "message": "",
+        "code": 200,
+        "result": {
+            "records": [
+                {
+                    "id": "1714844462045667329",
+                    "createBy": "admin",
+                    "createTime": "2023-10-19 11:22:34",
+                    "updateBy": "admin",
+                    "updateTime": "2023-10-19 11:23:16",
+                    "sysOrgCode": "A07A01",
+                    "paramCode": "bywg_pwd",
+                    "paramName": "用户退出权限密码",
+                    "paramType": "0",
+                    "paramTypeName": "安全",
+                    "paramValue": "123",
+                    "paramRemark": "边缘网关-用户退出权限密码"
+                }
+            ],
+            "total": 1,
+            "size": 10,
+            "current": 1,
+            "orders": [],
+            "optimizeCountSql": true,
+            "searchCount": true,
+            "countId": null,
+            "maxLimit": null,
+            "pages": 1
+        },
+        "timestamp": 1697794877372
+    }*/
+            string paramValue = string.Empty;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.Timeout = new TimeSpan(0, 0, 3);
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
 
-        //        try
-        //        {
-        //            var path = "http://10.90.18.189:8080/minifi/checkConnect";
-        //            //get
-        //            var url1 = new Uri(path);
-        //            // response
-        //            var response = httpClient.GetAsync(url1).Result;
-        //            var data = response.Content.ReadAsStringAsync().Result;
+                try
+                {
 
-        //            var obj = JsonConvert.DeserializeObject<JObject>(data);
+                    var path = "http://10.90.21.191:9910/hanyun/sys/sysParam/list?paramCode=bywg_pwd";
+                    //get
+                    var url1 = new Uri(path);
+                    // response
+                    var response = httpClient.GetAsync(url1).Result;
 
-        //            if (obj != null)
-        //            {
-        //                string result = obj.Children().FirstOrDefault(x => x.Path == "status").First.ToString();
-        //            }
+                    var data = response.Content.ReadAsStringAsync().Result;
 
-        //            try
-        //            {
-        //                StreamWriter sw = new StreamWriter(Application.StartupPath + "\\EarlyWarning.txt", false);
+                    if (data != null)
+                    {
 
-        //                _edgeGatewayModel.earlyWarning = uName;
+                        var obj = JsonConvert.DeserializeObject<JObject>(data);
 
-        //                sw.WriteLine(uName);
-        //                sw.Close();//写入
-        //            }
-        //            catch (Exception ex)
-        //            {
+                        if (obj != null)
+                        {
+                            var code = obj.Children().FirstOrDefault(x => x.Path == "code").First.ToString();
 
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            isconnect = false;
-        //            _edgeGatewayModel.IOTConnectInfo.result = isconnect;
+                            if (code == "200")
+                            {
+                                //result 对象
+                                var result = obj.Children().FirstOrDefault(x => x.Path == "result").First.ToString();
 
-        //            logger.Error($"{"HttpGetIOTConnectError:" + ex.Message}");
-        //        }
-        //    }
-        //}
+                                //result 对象数组
+                                var results = JsonConvert.DeserializeObject<JObject>(result).Children().FirstOrDefault().First.ToString();
 
+                                //records数组
+                                var records = JsonConvert.DeserializeObject<List<JObject>>(results);
 
+                                paramValue = records.Children().FirstOrDefault(x => x.Path == "paramValue").First.ToString();
+
+                                try
+                                {
+                                    StreamWriter sw = new StreamWriter(Application.StartupPath + "\\Bywgpwd.txt", false);
+
+                                    _edgeGatewayModel.Bywgpwd = paramValue;
+
+                                    sw.WriteLine(paramValue);
+                                    sw.Close();//写入
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    paramValue = "";
+                    _edgeGatewayModel.Bywgpwd = paramValue;
+
+                    logger.Error($"{"exitpassword:" + ex.Message}");
+                }
+            }
+        }
 
         /// <summary>
         /// 后台服务状态
