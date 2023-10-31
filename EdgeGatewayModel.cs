@@ -148,30 +148,70 @@ namespace EdgeGateway
         /// </summary>
         public List<string> WeldingMode { get; set; } = new List<string>();
 
+        ///// <summary>
+        ///// 阈值的电流电压的上限下限报警
+        ///// </summary>
+        //public bool IsCurrentVoltageAlarm
+        //{
+        //    get
+        //    {
+        //        return CVWMInfo.medianCurrentexceed || CVWMInfo.maxCurrentexceed || CVWMInfo.minCurrentexceed
+        //            || CVWMInfo.medianVoltageexceed || CVWMInfo.maxVoltageexceed || CVWMInfo.minVoltageexceed;
+        //    }
+        //}
+
         /// <summary>
-        /// 阈值的电流电压的上限下限报警
+        /// 阈值的电流上限下限报警
         /// </summary>
-        public bool IsCurrentVoltageAlarm
+        public bool IsCurrentAlarm
         {
             get
             {
-                return CVWMInfo.medianCurrentexceed || CVWMInfo.maxCurrentexceed || CVWMInfo.minCurrentexceed
-                    || CVWMInfo.medianVoltageexceed || CVWMInfo.maxVoltageexceed || CVWMInfo.minVoltageexceed;
+                return CVWMInfo.medianCurrentexceed || CVWMInfo.maxCurrentexceed || CVWMInfo.minCurrentexceed;
             }
         }
 
         /// <summary>
-        /// 预警的电流电压的上限下限报警
+        /// 阈值的电压上限下限报警
         /// </summary>
-        public bool IsCurrentVoltageAlarmYujing
+        public bool IsVoltageAlarm
         {
             get
             {
-                return CVWMInfo.medianCurrentexceedYujing || CVWMInfo.maxCurrentexceedYujing || CVWMInfo.minCurrentexceedYujing
-                    || CVWMInfo.medianVoltageexceedYujing || CVWMInfo.maxVoltageexceedYujing || CVWMInfo.minVoltageexceedYujing;
+                return CVWMInfo.medianVoltageexceed || CVWMInfo.maxVoltageexceed || CVWMInfo.minVoltageexceed;
             }
         }
 
+        ///// <summary>
+        ///// 预警的电流电压的上限下限报警
+        ///// </summary>
+        //public bool IsCurrentVoltageAlarmYujing
+        //{
+        //    get
+        //    {
+        //        return CVWMInfo.medianCurrentexceedYujing || CVWMInfo.maxCurrentexceedYujing || CVWMInfo.minCurrentexceedYujing
+        //            || CVWMInfo.medianVoltageexceedYujing || CVWMInfo.maxVoltageexceedYujing || CVWMInfo.minVoltageexceedYujing;
+        //    }
+        //}
+
+        /// <summary>
+        /// 预警的电流的上限下限报警
+        /// </summary>
+        public bool IsCurrentAlarmYujing
+        {
+            get
+            {
+                return CVWMInfo.medianCurrentexceedYujing || CVWMInfo.maxCurrentexceedYujing || CVWMInfo.minCurrentexceedYujing;             
+            }
+        }
+
+        public bool IsVoltageAlarmYujing
+        {
+            get
+            {
+                return CVWMInfo.medianVoltageexceedYujing || CVWMInfo.maxVoltageexceedYujing || CVWMInfo.minVoltageexceedYujing;
+            }
+        }
 
         /// <summary>
         /// 任务模块

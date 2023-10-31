@@ -38,7 +38,7 @@ namespace EdgeGateway
 
         private LampManageUSB _lampManageUSB;
 
-        public static int FormStytle = 1;
+        public static int FormStytle = 0;
 
         public RestService()
         {
@@ -70,7 +70,7 @@ namespace EdgeGateway
 
             getHasTaskLampMode();
 
-            HttpGetBywgpwd();
+            //HttpGetBywgpwd();
 
             HttpQueryByCodeAndType();
         }
@@ -399,7 +399,11 @@ namespace EdgeGateway
         }
 
         /// <summary>
-        /// nifi 获取选择的焊接能力
+        /// 这段代码定义了一个名为getHasTaskWeldingMode的公共方法，返回类型为nifiWeldMode。
+        /// 该方法首先判断是否存在名为WeldMode.txt的文件，
+        /// 如果不存在，则返回_edgeGatewayModel.WeldMode的值。
+        /// 如果文件存在，则读取文件中的第一行内容，如果文件为空，则返回_edgeGatewayModel.WeldMode的值，否则返回文件中的内容。
+        /// 最后将结果封装在nifiWeldMode对象中并返回。
         /// </summary>
         /// <returns></returns>
         public nifiWeldMode getHasTaskWeldingMode()
@@ -462,6 +466,11 @@ namespace EdgeGateway
                     var response = httpClient.GetAsync(url1).Result;
                     var data = response.Content.ReadAsStringAsync().Result;
                     //data = "[]";
+
+                    //_edgeGatewayModel.HasTask = true;
+
+                    //_edgeGatewayModel.TaskInfo.op_content = "被北备背悲辈杯臂贝倍碑卑呗埤孛庳";
+                    //_edgeGatewayModel.TaskInfo.op_remarks = "才采菜财材彩裁猜蔡踩睬卑呗埤孛庳";
 
                     if (data != null && data.Length > 10)
                     {
@@ -1358,6 +1367,112 @@ namespace EdgeGateway
             }
         }
 
+
+        /// <summary>
+        /// HTTP请求获取退出密码
+        /// </summary>
+        public void HttpGetBywgpwd()
+        {
+            /*{
+            "success": true,
+            "message": "",
+            "code": 200,
+            "result": {
+                "records": [
+                    {
+                        "id": "1716726368200237058",
+                        "createBy": "liheping",
+                        "createTime": "2023-10-24 16:00:36",
+                        "updateBy": "liheping",
+                        "updateTime": "2023-10-24 16:11:54",
+                        "sysOrgCode": null,
+                        "paramCode": "bywg_pwd",
+                        "paramName": "用户退出权限密码",
+                        "paramType": "1",
+                        "paramTypeName": "系统",
+                        "paramValue": "AA",
+                        "paramRemark": "边缘网关-用户退出权限密码"
+                    }
+                ],
+                "total": 1,
+                "size": 10,
+                "current": 1,
+                "orders": [],
+                "optimizeCountSql": true,
+                "searchCount": true,
+                "countId": null,
+                "maxLimit": null,
+                "pages": 1
+            },
+            "timestamp": 1698135185689
+         }*/
+            string paramValue = string.Empty;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.Timeout = new TimeSpan(0, 0, 3);
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
+
+                try
+                {
+                    var path = configData.Children().FirstOrDefault(x => x.Path == "queryBywgpwd").First.ToString();
+
+                    //get
+                    var url1 = new Uri(path);
+                    // response
+                    var response = httpClient.GetAsync(url1).Result;
+
+                    var data = response.Content.ReadAsStringAsync().Result;
+
+                    if (data != null)
+                    {
+
+                        var obj = JsonConvert.DeserializeObject<JObject>(data);
+
+                        if (obj != null)
+                        {
+                            var code = obj.Children().FirstOrDefault(x => x.Path == "code").First.ToString();
+
+                            if (code == "200")
+                            {
+                                //result 对象
+                                var result = obj.Children().FirstOrDefault(x => x.Path == "result").First.ToString();
+
+                                //result 对象数组
+                                var results = JsonConvert.DeserializeObject<JObject>(result).Children().FirstOrDefault().First.ToString();
+
+                                //records数组
+                                var records = JsonConvert.DeserializeObject<List<JObject>>(results);
+
+                                paramValue = records.Children().FirstOrDefault(x => x.Path == "paramValue").First.ToString();
+
+                                try
+                                {
+                                    StreamWriter sw = new StreamWriter(Application.StartupPath + "\\Bywgpwd.txt", false);
+
+                                    _edgeGatewayModel.Bywgpwd = paramValue;
+
+                                    sw.WriteLine(paramValue);
+                                    sw.Close();//写入
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    paramValue = "";
+                    _edgeGatewayModel.Bywgpwd = paramValue;
+
+                    logger.Error($"{"exitpassword:" + ex.Message}");
+                }
+            }
+        }
+
+
         /// <summary>
         /// 任务存在的情况下，两边的焊接模式是否一致
         /// </summary>
@@ -1539,55 +1654,135 @@ namespace EdgeGateway
                     //喇叭开着
                     if (_lampManageWifi._isUseBuzz)
                     {
-                        //报警,不预警
-                        if (_edgeGatewayModel.IsCurrentVoltageAlarm && !_edgeGatewayModel.IsCurrentVoltageAlarmYujing)
+                        //电流超报警 红，电压超报警 红==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，报警:" + 1550}");
-
                             _lampManageWifi.SetLampStatus(1);
                         }
 
-                        //预警，不报警
-                        if (_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
+                        //电流超报警 红，电压超预警，不超报警 黄==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，预警:" + 1580}");
+                            _lampManageWifi.SetLampStatus(1);
+                        }
+                        //电流超报警 红，电压不超预警，不超报警  绿==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && !(_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsVoltageAlarm))
+                        {
+                            _lampManageWifi.SetLampStatus(1);
+                        }
 
+
+
+
+                        //电流不超报警 超预警 黄，电压超报警 红==》 红灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(1);
+                        }
+
+                        //电流不超报警 超预警 黄，电压超预警 不超报警 黄==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsVoltageAlarmYujing)
+                        {
                             _lampManageWifi.SetLampStatus(2);
                         }
 
-                        //不报警也不预警
-                        if (!_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
+                        //电流不超报警 超预警 黄，电压不超预警，不超报警  绿==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，不报警:" + 1566}");
+                            _lampManageWifi.SetLampStatus(2);
+                        }
 
+
+
+
+                        //电流不超预警，不超报警 绿，电压超预警 超报警 红==》 红灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && _edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(1);
+                        }
+
+                        //电流不超预警，不超报警 绿，电压超预警 不超报警 黄==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(2);
+                        }
+
+                        //电流不超预警，不超报警 绿，电压不超预警 不超报警 绿==》 绿灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsCurrentAlarm && !_edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
+                        {
                             _lampManageWifi.SetLampStatus(4);
                         }
                     }
 
                     //喇叭关着
+                    //电流              电压          结果
+                    //红                红            红
+                    //红                黄            红
+                    //红                绿            红
+                    //黄                红            红
+                    //黄                黄            黄
+                    //黄                绿            黄
+                    //绿                红            红
+                    //绿                黄            黄
+                    //绿                绿            绿
                     else
                     {
-                        //报警,不预警
-                        if (_edgeGatewayModel.IsCurrentVoltageAlarm && !_edgeGatewayModel.IsCurrentVoltageAlarmYujing)
+                        //电流超报警 红，电压超报警 红==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，报警:" + 1578}");
-
                             _lampManageWifi.SetLampStatus(5);
                         }
 
-                        //预警，不报警
-                        if (_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
+                        //电流超报警 红，电压超预警，不超报警 黄==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，预警:" + 1586}");
+                            _lampManageWifi.SetLampStatus(5);
+                        }
+                        //电流超报警 红，电压不超预警，不超报警  绿==》 红灯
+                        if (_edgeGatewayModel.IsCurrentAlarm && !(_edgeGatewayModel.IsVoltageAlarmYujing || _edgeGatewayModel.IsVoltageAlarm))
+                        {
+                            _lampManageWifi.SetLampStatus(5);
+                        }
 
+
+
+
+                        //电流不超报警 超预警 黄，电压超报警 红==》 红灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(5);
+                        }
+
+                        //电流不超报警 超预警 黄，电压超预警 不超报警 黄==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsVoltageAlarmYujing)
+                        {
                             _lampManageWifi.SetLampStatus(6);
                         }
 
-                        //不报警也不预警
-                        if (!_edgeGatewayModel.IsCurrentVoltageAlarmYujing && !_edgeGatewayModel.IsCurrentVoltageAlarm)
+                        //电流不超报警 超预警 黄，电压不超预警，不超报警  绿==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
                         {
-                            logger.Info($"{"喇叭开，不报警:" + 1598}");
+                            _lampManageWifi.SetLampStatus(6);
+                        }
 
+
+
+
+                        //电流不超预警，不超报警 绿，电压超预警 超报警 红==》 红灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && _edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && _edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(5);
+                        }
+
+                        //电流不超预警，不超报警 绿，电压超预警 不超报警 黄==》 黄灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsCurrentAlarm && _edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
+                        {
+                            _lampManageWifi.SetLampStatus(6);
+                        }
+
+                        //电流不超预警，不超报警 绿，电压不超预警 不超报警 绿==》 绿灯
+                        if (!_edgeGatewayModel.IsCurrentAlarmYujing && !_edgeGatewayModel.IsCurrentAlarm && !_edgeGatewayModel.IsVoltageAlarmYujing && !_edgeGatewayModel.IsVoltageAlarm)
+                        {
                             _lampManageWifi.SetLampStatus(4);
                         }
                     }
@@ -1662,121 +1857,33 @@ namespace EdgeGateway
 
         public string ExitExt(string uName)
         {
-            if (uName == _edgeGatewayModel.Bywgpwd)
+            if (!string.IsNullOrWhiteSpace(_edgeGatewayModel.Bywgpwd))
             {
-                Application.Exit();
-                return _edgeGatewayModel.Bywgpwd;
+                if (uName == _edgeGatewayModel.Bywgpwd)
+                {
+                    Application.Exit();
+                    return _edgeGatewayModel.Bywgpwd;
+                }
+                else
+                {
+                    return "密码不正确，请重新输入密码！";
+                }
             }
             else
             {
-                return "密码不正确，请重新输入密码！";
-            }
-        }
-
-        /// <summary>
-        /// HTTP请求获取退出密码
-        /// </summary>
-        public void HttpGetBywgpwd()
-        {
-            /*
-     {
-        "success": true,
-        "message": "",
-        "code": 200,
-        "result": {
-            "records": [
+                if (uName == "xcmg@123")
                 {
-                    "id": "1714844462045667329",
-                    "createBy": "admin",
-                    "createTime": "2023-10-19 11:22:34",
-                    "updateBy": "admin",
-                    "updateTime": "2023-10-19 11:23:16",
-                    "sysOrgCode": "A07A01",
-                    "paramCode": "bywg_pwd",
-                    "paramName": "用户退出权限密码",
-                    "paramType": "0",
-                    "paramTypeName": "安全",
-                    "paramValue": "123",
-                    "paramRemark": "边缘网关-用户退出权限密码"
+                    Application.Exit();
+                    return _edgeGatewayModel.Bywgpwd;
                 }
-            ],
-            "total": 1,
-            "size": 10,
-            "current": 1,
-            "orders": [],
-            "optimizeCountSql": true,
-            "searchCount": true,
-            "countId": null,
-            "maxLimit": null,
-            "pages": 1
-        },
-        "timestamp": 1697794877372
-    }*/
-            string paramValue = string.Empty;
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.Timeout = new TimeSpan(0, 0, 3);
-                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");//设置请求头
-
-                try
+                else
                 {
-
-                    var path = "http://10.90.21.191:9910/hanyun/sys/sysParam/list?paramCode=bywg_pwd";
-                    //get
-                    var url1 = new Uri(path);
-                    // response
-                    var response = httpClient.GetAsync(url1).Result;
-
-                    var data = response.Content.ReadAsStringAsync().Result;
-
-                    if (data != null)
-                    {
-
-                        var obj = JsonConvert.DeserializeObject<JObject>(data);
-
-                        if (obj != null)
-                        {
-                            var code = obj.Children().FirstOrDefault(x => x.Path == "code").First.ToString();
-
-                            if (code == "200")
-                            {
-                                //result 对象
-                                var result = obj.Children().FirstOrDefault(x => x.Path == "result").First.ToString();
-
-                                //result 对象数组
-                                var results = JsonConvert.DeserializeObject<JObject>(result).Children().FirstOrDefault().First.ToString();
-
-                                //records数组
-                                var records = JsonConvert.DeserializeObject<List<JObject>>(results);
-
-                                paramValue = records.Children().FirstOrDefault(x => x.Path == "paramValue").First.ToString();
-
-                                try
-                                {
-                                    StreamWriter sw = new StreamWriter(Application.StartupPath + "\\Bywgpwd.txt", false);
-
-                                    _edgeGatewayModel.Bywgpwd = paramValue;
-
-                                    sw.WriteLine(paramValue);
-                                    sw.Close();//写入
-                                }
-                                catch (Exception ex)
-                                {
-
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    paramValue = "";
-                    _edgeGatewayModel.Bywgpwd = paramValue;
-
-                    logger.Error($"{"exitpassword:" + ex.Message}");
+                    return "密码不正确，请重新输入密码！";
                 }
             }
         }
+
+
 
         /// <summary>
         /// 后台服务状态
